@@ -28,7 +28,7 @@ SECRET_KEY = "django-insecure-=q5n8_klfyv*zeb*hqo*$#^^!8-=0v!c(9=1@s2e#kuxy&*72&
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["https://task-manger-production.up.railway.app"]
+ALLOWED_HOSTS = ["task-manger-production.up.railway.app"]
 CSRF_TRUSTED_ORIGINS = ["https://task-manger-production.up.railway.app"]
 LOGIN_URL = "/menu/"
 
