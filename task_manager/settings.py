@@ -84,13 +84,24 @@ WSGI_APPLICATION = "task_manager.wsgi.application"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": "taskmanager",
+        "NAME": "railway",
         "USER": "postgres",
-        "PASSWORD": "1234",
-        "HOST": "localhost",
-        "PORT": "5432",
+        "PASSWORD": "agxZfiwUZLjXvCRpAVTaPSikpRlExjZZ",
+        "HOST": "trolley.proxy.rlwy.net",
+        "PORT": "21967",
     }
 }
+
+# DATABASES = {
+#     "default": {
+#         "ENGINE": "django.db.backends.postgresql",
+#         "NAME": "taskmanager",
+#         "USER": "postgres",
+#         "PASSWORD": "1234",
+#         "HOST": "localhost",
+#         "PORT": "5432",
+#     }
+# }
 
 
 # Password validation

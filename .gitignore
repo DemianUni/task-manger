@@ -7,5 +7,7 @@ env/
 # Ignorar la carpeta history
 .history/
 
-# Ignorar el archivo notas.txt
+# Ignorar el archivo archivos
 notas.txt
+backupdb.py
+database_restore.py
