@@ -1,2 +1,2 @@
 # task-manger
-se actualiza todo y se sincronisa
+se actualiza todo y se sincronisa jeje
