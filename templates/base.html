@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>
+      {% block title %}
+        Mi Sitio Web
+      {% endblock %}
+    </title>
+    <!-- Vincula el CSS de Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <style>
+      body {
+        font-family: 'Arial', sans-serif;
+      }
+      
+      /* Estilo para la barra flotante en la parte superior derecha */
+      .floating-bar {
+        position: fixed;
+        top: 10px;
+        right: 10px;
+        z-index: 1050;
+        background-color: #343a40;
+        padding: 10px 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      
+      .floating-bar a {
+        color: #fff;
+        text-decoration: none;
+        padding: 8px 12px;
+        border-radius: 4px;
+        font-weight: 600;
+        transition: background-color 0.3s ease;
+      }
+      
+      .floating-bar a:hover {
+        background-color: #007bff;
+      }
+      
+      .floating-bar .btn-outline-danger {
+        border: 2px solid #e74a3b;
+      }
+      
+      .floating-bar .btn-outline-primary {
+        border: 2px solid #007bff;
+      }
+      
+      /* Corregido el borde de color info */
+      .floating-bar .btn-outline-info {
+        border: 2px solid #17a2b8; /* Color info en Bootstrap */
+        color: white; /* Para asegurar que el texto se vea del mismo color */
+      }
+      
+      /* Estilo para la campanita */
+      .notification-bell {
+        position: relative;
+        color: #fff;
+        font-size: 24px;
+        cursor: pointer;
+        transition: color 0.3s ease;
+      }
+      
+      .notification-bell:hover {
+        color: #f39c12; /* Color al pasar el mouse */
+      }
+      
+      /* Punto rojo de notificación */
+      .notification-bell .notification-dot {
+        position: absolute;
+        top: -5px;
+        right: -5px;
+        width: 10px;
+        height: 10px;
+        background-color: red;
+        border-radius: 50%;
+        display: none; /* Oculto por defecto */
+      }
+      
+      .notification-bell.new-notification .notification-dot {
+        display: block; /* Mostrar el punto cuando haya notificaciones */
+      }
+      
+      .notification-bell.new-notification {
+        color: #f39c12; /* Cambiar el color del ícono cuando haya notificaciones */
+      }
+      
+      /* Modal vacío */
+      .modal-header {
+        background-color: #007bff;
+        color: white;
+        border-bottom: 1px solid #ddd;
+      }
+      
+      .modal-body {
+        padding: 30px;
+      }
+      
+      .modal-footer {
+        border-top: none;
+      }
+      
+      .modal-dialog.custom-width {
+        max-width: 90%; /* O cualquier valor que prefieras */
+      }
+    </style>
+    {% block extra_css %}
+
+    {% endblock %}
+  </head>
+
+  <body>
+    <!-- Barra flotante de opciones en la parte superior derecha -->
+    <div class="floating-bar">
+      <i class="bi bi-bell notification-bell" data-bs-toggle="modal" data-bs-target="#notificationModal"><span class="notification-dot"></span> <!-- Punto rojo --></i>
+      {% if user.is_authenticated %}
+        <span class="text-white">Hola, {{ user.username }}</span>
+        {% if user.is_superuser %}
+          <a class="btn btn-outline-danger" href="{% url 'admin:index' %}">admin</a>
+        {% endif %}
+        <a class="btn btn-outline-danger" href="{% url 'logout' %}">Cerrar sesión</a>
+        <a href="{% url 'tasks_list' %}" class="btn btn-outline-primary">Tareas</a>
+        <a href="{% url 'gantt_chart' %}" class="btn btn-outline-info">Ver Gantt</a>
+      {% else %}
+        <a class="btn btn-outline-primary" href="#" data-bs-toggle="modal" data-bs-target="#loginModal">Iniciar sesión</a>
+        <a href="{% url 'gantt_chart' %}" class="btn btn-outline-info">Ver Gantt</a>
+      {% endif %}
+    </div>
+
+    <!-- Modal con los títulos de las tareas -->
+    <div class="modal fade" id="notificationModal" tabindex="-1" aria-labelledby="taskModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-lg custom-width">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="taskModalLabel">Notificaciones</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body" id="notificationContent">
+            <!-- El contenido de las notificaciones se inyectará aquí mediante AJAX -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal de inicio de sesión -->
+    <div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="loginModalLabel">Iniciar sesión</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <form method="POST" action="{% url 'login' %}">
+              {% csrf_token %}
+              <div class="mb-3">
+                <label for="username" class="form-label">Nombre de usuario</label>
+                <input type="text" class="form-control" id="username" name="username" required />
+              </div>
+              <div class="mb-3">
+                <label for="password" class="form-label">Contraseña</label>
+                <input type="password" class="form-control" id="password" name="password" required />
+              </div>
+              <button type="submit" class="btn btn-primary">Iniciar sesión</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Contenedor principal donde se renderiza el contenido de las páginas hijas -->
+    <div class="container mt-4">
+      {% block content %}
+
+      {% endblock %}
+    </div>
+
+    <script>
+      // Función para verificar notificaciones y guardar el estado
+      function checkNotifications() {
+        fetch("{% url 'not' %}")
+          .then((response) => response.text())
+          .then((data) => {
+            const parser = new DOMParser()
+            const doc = parser.parseFromString(data, 'text/html')
+      
+            // Verifica si hay tareas vencidas o solapadas
+            const hasNotifications = doc.querySelector('.list-group-item:not(:empty)') !== null && !data.includes('No hay tareas vencidas.') || !data.includes('No hay tareas solapadas.')
+      
+            // Guardar el estado en localStorage
+            localStorage.setItem('hasNotifications', hasNotifications)
+      
+            updateNotificationBell(hasNotifications)
+          })
+          .catch((error) => {
+            console.error('Error al verificar notificaciones:', error)
+          })
+      }
+      
+      // Función para actualizar el estado visual de la campanita
+      function updateNotificationBell(hasNotifications) {
+        const notificationBell = document.querySelector('.notification-bell')
+        if (hasNotifications) {
+          notificationBell.classList.add('new-notification')
+        } else {
+          notificationBell.classList.remove('new-notification')
+        }
+      }
+      
+      // Al cargar cualquier página
+      document.addEventListener('DOMContentLoaded', function () {
+        // Primero restauramos el estado guardado
+        const savedNotificationState = localStorage.getItem('hasNotifications')
+        if (savedNotificationState === 'true') {
+          updateNotificationBell(true)
+        }
+      
+        // Luego verificamos si hay nuevas notificaciones
+        checkNotifications()
+      })
+      
+      // Mantener el código existente para el modal
+      document.getElementById('notificationModal').addEventListener('show.bs.modal', function (event) {
+        fetch("{% url 'not' %}")
+          .then((response) => response.text())
+          .then((data) => {
+            document.getElementById('notificationContent').innerHTML = data
+          })
+          .catch((error) => {
+            console.error('Error al cargar las notificaciones:', error)
+          })
+      })
+    </script>
+
+    <!-- Vincula los scripts de Bootstrap -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    {% block extra_js %}
+
+    {% endblock %}
+  </body>
+</html>

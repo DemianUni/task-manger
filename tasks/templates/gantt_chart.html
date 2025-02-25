@@ -1,0 +1,223 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <style>
+    .titulo {
+      text-align: center;
+      margin-bottom: 30px;
+      font-size: 2.5rem;
+      font-weight: bold;
+      margin-top: 38px;
+    }
+    .overdue-list {
+      margin-top: 40px;
+    }
+    #chart_div {
+      width: 100%;
+      min-height: 400px;
+      height: auto !important;
+    }
+    .google-visualization-gantt-container {
+      height: auto !important;
+      min-height: 400px;
+    }
+  </style>
+
+  <a href="{% url 'menu' %}" class="btn btn-primary"><i class="bi bi-arrow-left"></i></a>
+
+  <div class="titulo">
+    <h1>Diagrama de Gantt de Tareas</h1>
+  </div>
+
+  <div id="chart_div"></div>
+
+  <div class="container mt-4 mb-5">
+    <h1 class="mb-4">Tareas Semanales</h1>
+    <div class="table-responsive">
+      <table class="table table-hover table-bordered">
+        <thead class="table-dark">
+          <tr>
+            <th scope="col" class="text-center">ID</th>
+            <th scope="col">Título</th>
+            <th scope="col">Categoría</th>
+            <th scope="col">Estado</th>
+            <th scope="col">Revisión</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for task in weekly_tasks %}
+            <tr>
+              <td class="text-center">{{ forloop.counter }}</td>
+              <td title="{{ task.description }}">{{ task.title }}</td>
+              <td>{{ task.get_category_display }}</td>
+              <td class="text-center align-middle
+                          {% if task.status == 'completed' %}
+                  
+                  bg-success text-white
+
+                {% elif task.status == 'overdue' %}
+                  
+                  bg-danger text-white
+
+                {% elif task.status == 'due_soon' %}
+                  
+                  bg-warning text-dark
+
+                {% elif task.status == 'in_progress' %}
+                  
+                  bg-secondary text-white
+
+                {% else %}
+                  
+                  bg-primary text-white
+
+                {% endif %}">{{ task.get_status_display }}</td>
+              <td>{{ task.get_evaluation_day_display }}</td>
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="5" class="text-center text-muted">
+                <i class="fas fa-inbox fa-2x mb-2"></i>
+                <p>No hay tareas semanales disponibles.</p>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+  <script type="text/javascript">
+    function initGanttChart() {
+      google.charts.load('current', {'packages':['gantt'], 'language': 'es'});
+      google.charts.setOnLoadCallback(drawChart);
+    }
+
+    function drawChart() {
+      var data = new google.visualization.DataTable();
+      data.addColumn('string', 'ID Tarea');
+      data.addColumn('string', 'Nombre Tarea');
+      data.addColumn('string', 'Categoría');
+      data.addColumn('date', 'Inicio');
+      data.addColumn('date', 'Fin');
+      data.addColumn('number', 'Duración');
+      data.addColumn('number', 'Completado');
+      data.addColumn('string', 'Dependencias');
+      data.addColumn('string', 'Color');  // Nueva columna para colores
+
+      const categoryConfig = {
+        'estadistica_informacion': {
+          name: 'Estadística e Información',
+          color: '#4285F4'  // Azul
+        },
+        'planeacion_estrategia': {
+          name: 'Planeación y Estrategia',
+          color: '#34A853'  // Verde
+        },
+        'procesos_r': {
+          name: 'Procesos /R',
+          color: '#FBBC05'  // Amarillo
+        },
+        'alianzas': {
+          name: 'Alianzas',
+          color: '#EA4335'  // Rojo
+        }
+      };
+
+      const ganttData = {{ gantt_data|safe }};
+      const rows = ganttData.map(task => {
+        const startDate = new Date(task.start);
+        const endDate = new Date(task.end);
+        const now = new Date();
+        
+        let progress = 0;
+        if (now >= startDate) {
+          const totalDuration = endDate - startDate;
+          const elapsedTime = now - startDate;
+          if (elapsedTime < totalDuration) {
+            progress = (elapsedTime / totalDuration) * 100;
+          } else {
+            progress = 100;
+          }
+        }
+
+        progress = progress.toFixed(2);
+        if (endDate < now) {
+          progress = 100;
+        }
+
+        // Incluir el color específico de la categoría
+        const categoryInfo = categoryConfig[task.category];
+        return [
+          String(task.id),
+          task.title,
+          categoryInfo.name,
+          startDate,
+          endDate,
+          null,
+          parseFloat(progress),
+          task.dependencies.join(','),
+          categoryInfo.color  // Color específico para esta tarea
+        ];
+      });
+
+      data.addRows(rows);
+
+      var options = {
+        width: '100%',
+        height: data.getNumberOfRows() * 32 + 10,
+        gantt: {
+          criticalPathEnabled: false,
+          labelStyle: { fontSize: 12 },
+          barCornerRadius: 3,
+          labelMaxWidth: 300,
+          percentEnabled: true,
+          percentStyle: {
+            fill: '#ffffff',
+            textStyle: { fontSize: 10 }
+          },
+          trackHeight: 30,
+          innerGridHorizLine: { stroke: '#eff0f1' },
+          innerGridTrack: { fill: '#f8f9fa' },
+          defaultStartDate: new Date(2024, 0, 1),
+          barColors: function (row) {
+            // Devolver el color específico de la tarea
+            return data.getValue(row, 8);
+          }
+        },
+        backgroundColor: '#ffffff',
+        now: new Date(),
+        chartArea: {
+          left: '20%',
+          width: '80%',
+          height: '100%'
+        }
+      };
+
+      try {
+        var chartDiv = document.getElementById('chart_div');
+        if (chartDiv) {
+          var chart = new google.visualization.Gantt(chartDiv);
+          chart.draw(data, options);
+          
+          chartDiv.style.height = (data.getNumberOfRows() * 41 + 50) + 'px';
+          
+          window.addEventListener('resize', function() {
+            options.height = data.getNumberOfRows() * 41 + 50;
+            chartDiv.style.height = options.height + 'px';
+            chart.draw(data, options);
+          });
+        }
+      } catch (error) {
+        console.error('Error al dibujar el gráfico:', error);
+      }
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initGanttChart);
+    } else {
+      initGanttChart();
+    }
+  </script>
+{% endblock %}

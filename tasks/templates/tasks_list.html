@@ -1,0 +1,233 @@
+{% extends 'base.html' %}
+
+{% block title %}
+  Lista de Tareas
+{% endblock %}
+
+{% block extra_css %}
+  <style>
+    .titulo {
+      text-align: center;
+      margin-bottom: 30px;
+      font-size: 2rem;
+      font-weight: bold;
+      margin-top: 38px;
+    }
+    /* Anchos personalizados para cada columna */
+    .col-id {
+      width: 1%;
+    }
+    .col-titulo {
+      width: 31%;
+    }
+    .col-categoria {
+      width: 16.5%;
+    }
+    .col-alianza {
+      width: 14%;
+    }
+    .col-dependencias {
+      width: 1%;
+    }
+    .col-fecha-i {
+      width: 9%;
+    }
+    .col-fecha {
+      width: 9%;
+    }
+    .col-estado {
+      width: 12%;
+    }
+    .col-acciones {
+      width: 6.5%;
+    }
+    .col-revision {
+      width: 10%;
+    }
+
+    /* Filtro de categorías */
+    .filter-container {
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+    }
+
+    .filter-container label {
+      font-weight: bold;
+      margin-right: 10px;
+    }
+
+    .filter-container select {
+      max-width: 250px;
+      width: 100%;
+    }
+
+    .btn-agregar {
+      margin-right: 20px !important; /* Espacio entre el botón y el filtro */
+    }
+  </style>
+{% endblock %}
+
+{% block content %}
+  <div class="container">
+    <a href="{% url 'menu' %}" class="btn btn-primary"><i class="bi bi-arrow-left"></i></a>
+
+    <!-- Título principal -->
+    <div class="titulo">
+      <h1>Lista de Tareas</h1>
+    </div>
+    <!-- Formulario de búsqueda -->
+    <form method="get" class="d-flex mb-3">
+      <input type="text" name="search" class="form-control me-2" placeholder="Buscar por nombre..."
+             value="{{ search_query }}">
+      <button type="submit" class="btn btn-primary">Buscar</button>
+    </form>
+
+    <!-- Filtro de Categoría y botón "Agregar" alineados -->
+    <div class="d-flex justify-content-start align-items-center mb-3">
+      <!-- Botón para crear una nueva tarea -->
+      <a href="{% url 'task_create' %}" class="btn btn-primary btn-agregar">Agregar Tarea</a>
+
+      <!-- Texto "Filtrar por Categoría" -->
+      <span class="ms-3">Filtrar por Categoría:</span>
+
+      <!-- Formulario de Filtro -->
+      <form method="get" class="mb-0 ms-2">
+        <select name="category" class="form-control" onchange="this.form.submit()">
+          <option value="">Todas las categorías</option>
+          <option value="estadistica_informacion" {% if request.GET.category == 'estadistica_informacion' %}selected{% endif %}>Estadística e Información</option>
+          <option value="planeacion_estrategia" {% if request.GET.category == 'planeacion_estrategia' %}selected{% endif %}>Planeación y Estrategia</option>
+          <option value="procesos_r" {% if request.GET.category == 'procesos_r' %}selected{% endif %}>Procesos /R</option>
+          <option value="alianzas" {% if request.GET.category == 'alianzas' %}selected{% endif %}>Alianzas</option>
+        </select>
+      </form>
+    </div>
+
+    <!-- Tabla con las tareas -->
+    <table class="table table-hover table-bordered">
+      <thead>
+        <tr class="align-middle">
+          <th class="col-id text-center">ID</th>  <!-- Nueva columna de numeración -->
+          <th class="col-titulo text-center">Título</th>
+          <th class="col-categoria text-center">Categoría</th>
+          <th class="col-alianza text-center">Alianza</th>
+          <th class="col-dependencias text-center">DP</th>
+          <th class="col-fecha-i text-center">Fecha de Inicio</th>
+          <th class="col-fecha text-center">Fecha de Vencimiento</th>
+          <th class="col-estado text-center">Estado</th>
+          <th class="col-acciones text-center">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for task in tasks %}
+          <tr>
+            <td class="text-center">{{ forloop.counter }}</td>  <!-- Aquí se muestra el número -->
+            <td class="col-titulo" data-bs-toggle="tooltip" data-bs-placement="top" title="{{ task.description }}">{{ task.title }}</td>
+            <td class="col-categoria" title="
+            {% if task.alianzas_object %}
+                {{ task.alianzas_object.title }}
+            {% elif task.planeacion_object %}
+                {{ task.planeacion_object.title }}
+            {% elif task.estadistica_object %}
+                {{ task.estadistica_object.title }}
+            {% elif task.procesos_object %}
+                {{ task.procesos_object.title }}
+            {% endif %}
+        ">{{ task.get_category_display }}</td>
+            <td class="col-alianza">{{ task.alianza }}</td>
+            <td class="col-dependencias text-center" 
+                {% if task.dependencies.all %}
+                    data-bs-toggle="tooltip" 
+                    title="{% for dependency in task.dependencies.all %}{{ dependency.title }}{% if not forloop.last %}, {% endif %}{% empty %}No tiene dependencias{% endfor %}"
+                {% else %}
+                    title="No tiene dependencias"
+               {% endif %}>
+            {{ task.dependencies.count }}
+            </td>
+            <td class="col-fecha-i text-center">{{ task.created_at|date:'d/m/Y' }}</td>
+            <td class="col-fecha text-center">{{ task.due_date|date:'d/m/Y' }}</td>
+            <td class="text-center align-middle
+                          {% if task.status == 'completed' %}bg-success text-white
+                        {% elif task.status == 'overdue' %}bg-danger text-white
+                      {% elif task.status == 'due_soon' %}bg-warning text-dark
+                    {% elif task.status == 'in_progress' %}bg-secondary text-white
+                  {% else %}bg-primary text-white{% endif %}">
+                {{ task.get_status_display }}
+            </td>
+            <td class="col-acciones text-center">
+              <!-- Botón para editar la tarea -->
+              <a href="{% url 'task_edit' task.pk %}" class="btn btn-success btn-sm" data-task-id="{{ task.pk }}">
+                <i class="bi bi-pencil"></i>
+            </a>
+
+              <!-- Botón para eliminar la tarea -->
+              <a href="{% url 'task_delete' task.pk %}" class="btn btn-danger btn-sm" onclick="return confirm('¿Estás seguro de que deseas eliminar esta tarea?')"><i class="bi bi-trash3-fill"></i></a>
+            </td>
+          </tr>
+        {% empty %}
+          <tr>
+            <td colspan="6" class="text-center">No hay tareas aún.</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <div class="titulo">
+      <h1>Lista de Tareas semanales</h1>
+    </div>
+    <div class="d-flex justify-content-start align-items-center mb-3">
+      <!-- Botón para crear una nueva tarea semanal -->
+    <a href="{% url 'WeeklyTask_create' %}" class="btn btn-primary btn-agregar">Agregar Tarea semanal</a>
+    </div>
+    <!-- Tabla con las tareas semanales -->
+    <table class="table table-hover table-bordered">
+      <thead>
+        <tr class="align-middle">
+          <th class="col-id text-center">ID</th>  <!-- Nueva columna de numeración -->
+          <th class="col-titulo text-center">Título</th>
+          <th class="col-categoria text-center">Categoría</th>
+          <th class="col-revision text-center">revisión</th>
+          <th class="col-estado text-center">Estado</th>
+          <th class="col-acciones text-center">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for taskw in WeeklyTasks %}
+          <tr>
+            <td class="text-center">{{ forloop.counter }}</td>  <!-- Aquí se muestra el número -->
+            <td class="col-titulo" data-bs-toggle="tooltip" data-bs-placement="top" title="{{ taskw.description }}">{{ taskw.title }}</td>
+            <td class="col-categoria">{{ taskw.get_category_display }}</td>
+            <td class="col-revision text-center">{{ taskw.get_evaluation_day_display }}</td>
+            <td class="text-center align-middle
+                          {% if taskw.status == 'completed' %}bg-success text-white
+                        {% elif taskw.status == 'overdue' %}bg-danger text-white
+                      {% elif taskw.status == 'due_soon' %}bg-warning text-dark
+                    {% elif taskw.status == 'in_progress' %}bg-secondary text-white
+                  {% else %}bg-primary text-white{% endif %}">
+                {{ taskw.get_status_display }}
+            </td>
+            <td class="col-acciones text-center">
+              <!-- Botón para editar la tarea -->
+              <a href="{% url 'weeklytask_edit' taskw.pk %}" class="btn btn-success btn-sm"><i class="bi bi-pencil"></i></a>
+
+              <!-- Botón para eliminar la tarea -->
+              <a href="{% url 'weeklytask_delete' taskw.pk %}" class="btn btn-danger btn-sm" onclick="return confirm('¿Estás seguro de que deseas eliminar esta tarea?')"><i class="bi bi-trash3-fill"></i></a>
+            </td>
+          </tr>
+        {% empty %}
+          <tr>
+            <td colspan="6" class="text-center">No hay tareas aún.</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <!-- Inicializa los tooltips -->
+  <script>
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+      return new bootstrap.Tooltip(tooltipTriggerEl)
+    })
+  </script>
+    
+    
+{% endblock %}

@@ -1,0 +1,229 @@
+{% extends 'base.html' %}
+
+{% block title %}
+  Alianzas - {{ years.current_year }}
+{% endblock %}
+
+{% block content %}
+  <style>
+    .titulo {
+      text-align: center;
+      margin-bottom: 30px;
+      font-size: 2.5rem;
+      font-weight: bold;
+      margin-top: 38px;
+    }
+    
+    .lista-container {
+      margin-bottom: 40px;
+    }
+    
+    .lista h4 {
+      font-size: 1.75rem;
+      font-weight: bold;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+    
+    .list-group-item {
+      font-size: 1.2rem;
+    }
+    
+    .table th:nth-child(1) {
+      width: 47%;
+    }
+    
+    .table th:nth-child(2) {
+      width: 17%;
+    }
+    
+    .table th:nth-child(3) {
+      width: 16%;
+    }
+    
+    .table th:nth-child(4) {
+      width: 20%;
+    }
+    
+    .add-button {
+      text-align: center;
+      margin-top: 20px;
+    }
+    
+    .btn-group-sm > .btn {
+      margin: 0 2px;
+    }
+    
+    .numero-item {
+      display: inline-block;
+      width: 20px; /* Ajusta este valor según tus necesidades */
+      text-align: right;
+      margin-right: 10px;
+    }
+  </style>
+  <div class="container">
+    <a href="{% url 'proyectos_año_presente' %}" class="btn btn-primary"><i class="bi bi-arrow-left"></i></a>
+    <!-- Título principal -->
+    <div class="titulo">
+      <h1>Proyectos {{ years.current_year }}</h1>
+    </div>
+
+    <!-- Lista de Alianzas -->
+    <div class="row">
+      <!-- Left Column -->
+      <div class="col-md-5">
+        <div class="lista-container lista" style="flex: 1; padding: 20px; border-radius: 8px; background-color: #f8f9fa; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+          <h4>Alianzas</h4>
+          <ul class="list-group">
+            {% for alianza in alianzas %}
+              <li class="list-group-item d-flex justify-content-between align-items-center">
+                <strong class="numero-item me-3">{{ forloop.counter }}.</strong>
+                <div title="{{ alianza.description }}" class="flex-grow-1">{{ alianza.title }}</div>
+                <div class="btn-group btn-group-sm">
+                  {% if user.is_authenticated and user.is_superuser %}
+                    <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#editAlianzaModal{{ alianza.id }}"><i class="bi bi-pencil"></i></button>
+                    <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteAlianzaModal{{ alianza.id }}"><i class="bi bi-trash3-fill"></i></button>
+                  {% endif %}
+                </div>
+              </li>
+            {% empty %}
+              <li class="list-group-item text-center">No hay proyectos</li>
+            {% endfor %}
+          </ul>
+          <div class="add-button">
+            {% if user.is_authenticated and user.is_superuser %}
+              <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#modalAlianzas">Agregar Proyecto</button>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column -->
+      <div class="col-md-7">
+        <div class="lista-container lista">
+          <h4>Resultados Esperados</h4>
+          <table class="table table-bordered">
+            <thead>
+              <tr>
+                <th class="text-center">Título</th>
+                <th class="text-center">Alianza</th>
+                <th class="text-center">Fecha de Vencimiento</th>
+                <th class="text-center">Estado</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for task in tasks_alianzas %}
+                <tr>
+                  <td class="col-titulo" data-bs-toggle="tooltip" data-bs-placement="top" title="{{ task.description }}">{{ task.title }}</td>
+                  <td>{{ task.alianza }}</td>
+                  <td class="text-center">{{ task.due_date|date:'d/m/Y' }}</td>
+                  <td class="text-center align-middle
+                          {% if task.status == 'completed' %}
+                      bg-success text-white
+
+                    {% elif task.status == 'overdue' %}
+                      bg-danger text-white
+
+                    {% elif task.status == 'due_soon' %}
+                      bg-warning text-dark
+
+                    {% elif task.status == 'in_progress' %}
+                      bg-secondary text-white
+
+                    {% else %}
+                      bg-primary text-white
+                    {% endif %}">{{ task.get_status_display }}</td>
+                </tr>
+              {% empty %}
+                <tr>
+                  <td colspan="6" class="text-center">No hay tareas asociadas a alianzas.</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal para Agregar Alianza -->
+  <div class="modal fade" id="modalAlianzas" tabindex="-1" aria-labelledby="modalAlianzasLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modalAlianzasLabel">Nuevo Proyecto</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <form method="post" action="{% url 'agregar_alianza_presente' %}">
+          {% csrf_token %}
+          <div class="modal-body">
+            <div class="mb-3">
+              <label for="title" class="form-label">Título</label>
+              <input type="text" class="form-control" id="title" name="title" required />
+            </div>
+            <div class="mb-3">
+              <label for="description" class="form-label">Descripción</label>
+              <textarea class="form-control" id="description" name="description" rows="3"></textarea>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            <button type="submit" class="btn btn-primary">Guardar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modales de Edición y Eliminación para Alianzas -->
+  {% for alianza in alianzas %}
+    <!-- Modal de Edición para cada alianza -->
+    <div class="modal fade" id="editAlianzaModal{{ alianza.id }}" tabindex="-1">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Editar Proyecto</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <form method="post" action="{% url 'editar_alianza_presente' alianza.id %}">
+            {% csrf_token %}
+            <div class="modal-body">
+              <div class="mb-3">
+                <label for="title" class="form-label">Título</label>
+                <input type="text" class="form-control" name="title" value="{{ alianza.title }}" required />
+              </div>
+              <div class="mb-3">
+                <label for="description" class="form-label">Descripción</label>
+                <textarea class="form-control" name="description">{{ alianza.description }}</textarea>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+              <button type="submit" class="btn btn-primary">Guardar cambios</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal de Eliminación para cada alianza -->
+    <div class="modal fade" id="deleteAlianzaModal{{ alianza.id }}" tabindex="-1">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Confirmar Eliminación</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">¿Está seguro de que desea eliminar el proyecto "{{ alianza.title }}"?</div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+            <form method="post" action="{% url 'eliminar_alianza_presente' alianza.id %}" style="display: inline;">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-danger">Eliminar</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  {% endfor %}
+{% endblock %}
