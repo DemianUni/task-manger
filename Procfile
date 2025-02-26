@@ -1,1 +1,1 @@
-web: gunicorn task_manager.wsgi --bind 0.0.0.0:$PORT
+web: python manage.py collectstatic && gunicorn task_manager.wsgi --bind 0.0.0.0:$PORT
