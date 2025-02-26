@@ -4,6 +4,7 @@ from django.utils import timezone
 from django.db.models.signals import pre_save, post_migrate
 from django.dispatch import receiver
 from django.apps import apps
+from django.contrib.auth.models import User
 
 
 class Task(models.Model):
@@ -48,6 +49,9 @@ class Task(models.Model):
         default="none",
         verbose_name="Tipo de modelo relacionado",
     )
+
+    # Relación con usuarios
+    assigned_users = models.ManyToManyField(User, blank=True, related_name="tasks")
 
     # Campos para las relaciones con los modelos específicos
     alianzas_object = models.ForeignKey(

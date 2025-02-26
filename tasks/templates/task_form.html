@@ -208,15 +208,18 @@
               
               <div class="row">
                 <!-- Dependencias con checkboxes y desplazamiento -->
-                <div class="col-md-8 mb-3">
+                <div class="col-md-8 mb-3 mt-2">
                   <label class="form-label">Dependencias:</label>
                   <div id="dependencies-container" 
-                       style="max-height: 120px; overflow-y: auto; border: 1px solid #ccc; padding: 10px; border-radius: 5px;">
+                       style="max-height: 148px; overflow-y: auto; border: 1px solid #ccc; padding: 10px; border-radius: 5px;">
                       {% for task in form.dependencies.field.queryset %}
                           {% if task.id != current_task.id %}  {# Oculta la tarea actual #}
-                              <div class="form-check dependency-item" data-created-at="{{ task.created_at|date:'Y-m-d' }}">
-                                  <input class="form-check-input dependency-checkbox" type="checkbox" name="dependencies" value="{{ task.id }}"
-                                         id="task-{{ task.id }}" {% if task.id in form.dependencies.value %}checked{% endif %}>
+                              <div class="form-check dependency-item" 
+                                   data-created-at="{{ task.created_at|date:'Y-m-d' }}" 
+                                   data-due-date="{{ task.due_date|date:'Y-m-d' }}">
+                                  <input class="form-check-input dependency-checkbox" type="checkbox" name="dependencies" 
+                                         value="{{ task.id }}" id="task-{{ task.id }}"
+                                         {% if task.id in form.dependencies.value %}checked{% endif %}>
                                   <label class="form-check-label" for="task-{{ task.id }}">
                                       {{ task.title }}
                                   </label>
@@ -225,22 +228,40 @@
                           {% endif %}
                       {% endfor %}
                   </div>
-              </div>
-              <!-- Estado -->
-              <div class="col-md-4 mb-3 mt-4">
-                <label for="status" class="form-label">Estado:</label>
-                <select class="form-control" id="status" name="status">
-                  <option value="in_progress" {% if form.status.value == 'in_progress' %}selected{% endif %}>En Proceso</option>
-                  <option value="completed" {% if form.status.value == 'completed' %}selected{% endif %}>Completado</option>
-                </select>
-                {% if form.status.errors %}
-                  <div class="text-danger">
-                    {% for error in form.status.errors %}
-                      <p>{{ error }}</p>
-                    {% endfor %}
+              </div>              
+                <!-- Estado -->
+                <div class="col-md-4 mb-3 mt-2">
+                  <div class="mb-2">
+                    <label for="status" class="form-label">Estado:</label>
+                    <select class="form-control" id="status" name="status">
+                      <option value="in_progress" {% if form.status.value == 'in_progress' %}selected{% endif %}>En Proceso</option>
+                      <option value="completed" {% if form.status.value == 'completed' %}selected{% endif %}>Completado</option>
+                    </select>
+                    {% if form.status.errors %}
+                      <div class="text-danger">
+                        {% for error in form.status.errors %}
+                          <p>{{ error }}</p>
+                        {% endfor %}
+                      </div>
+                    {% endif %}
                   </div>
-                {% endif %}
-              </div>
+                  <!-- Responsable -->
+                  <div class="col-md-8 mb-3">
+                    <label class="form-label">Usuarios asignados:</label>
+                    <div id="assigned-users-container"
+                         style="max-height: 70px; overflow-y: auto; border: 1px solid #ccc; padding: 10px; border-radius: 5px;">
+                        {% for user in form.assigned_users.field.queryset %}
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="assigned_users" value="{{ user.id }}"
+                                       id="user-{{ user.id }}" {% if user.id in form.assigned_users.value %}checked{% endif %}>
+                                <label class="form-check-label" for="user-{{ user.id }}">
+                                  {{ user.get_full_name|default:user.username }}
+                                </label>
+                            </div>
+                        {% endfor %}
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </form>
@@ -285,14 +306,12 @@
           // Actualizar los campos visibles según el tipo de modelo
           showSelectedField();
         }
-    
         // Función para ocultar todos los campos de objetos relacionados
         function hideAllRelatedFields() {
           document.querySelectorAll('.related-field').forEach(field => {
             field.style.display = 'none';
           });
         }
-    
         // Función para mostrar el campo correspondiente al tipo de modelo seleccionado
         function showSelectedField() {
           hideAllRelatedFields();
@@ -309,54 +328,65 @@
             document.getElementById('procesos-field').style.display = 'block';
           }
         }
-    
         // Evento para cambiar el tipo de proyecto cuando cambie la categoría
         categorySelect.addEventListener("change", updateRelatedType);
         
         // Evento para cambiar la visualización cuando cambie el tipo de modelo
         relatedTypeSelect.addEventListener("change", showSelectedField);
-    
-        // Ejecutar las funciones al cargar la página
+
         updateRelatedType();
         showSelectedField();
       });
     </script>
     <script>
       document.addEventListener("DOMContentLoaded", function () {
-          const dateInput = document.getElementById("created_at");
+          const dateInput = document.getElementById("created_at"); // Fecha de creación de la tarea actual
           const dependenciesContainer = document.getElementById("dependencies-container");
-      
+  
           function updateDependencies() {
-              const selectedDate = dateInput.value;
+              const selectedDate = dateInput.value; // Fecha de creación de la tarea actual
               const dependencyItems = dependenciesContainer.querySelectorAll(".dependency-item");
-      
+  
               dependencyItems.forEach(item => {
-                  const taskDate = item.getAttribute("data-created-at");
+                  const taskCreatedAt = item.getAttribute("data-created-at"); // Fecha de creación de la dependencia
+                  const taskDueDate = item.getAttribute("data-due-date"); // Fecha de vencimiento de la dependencia
                   const checkbox = item.querySelector(".dependency-checkbox");
                   const label = item.querySelector(".form-check-label");
                   const warning = item.querySelector(".dependency-warning");
-      
-                  if (taskDate >= selectedDate) {
-                      checkbox.disabled = true; // Deshabilita el checkbox
-                      label.style.color = "#888"; // Pone el texto en gris
-                      warning.style.display = "inline"; // Muestra el mensaje
-                      warning.textContent = (taskDate > selectedDate) 
-                          ? " (No se puede elegir: fecha posterior)" 
-                          : " (No se puede elegir: misma fecha de creación)";
+  
+                  let warningMessage = "";
+  
+                  // Regla 1: Mismo día de creación
+                  if (taskCreatedAt === selectedDate) {
+                      warningMessage = "No se puede elegir: Fecha de creación igual";
+                  }
+                  
+                  // Regla 2: Creación futura
+                  else if (taskCreatedAt > selectedDate) {
+                      warningMessage = "No se puede elegir: Fecha de creación futura";
+                  }
+                  
+                  // Regla 3: Fecha de vencimiento mayor a la fecha de creación de la tarea actual
+                  else if (taskDueDate > selectedDate) {
+                      warningMessage = "No se puede elegir: Fecha de finalización no completada";
+                  }
+  
+                  if (warningMessage) {
+                      checkbox.disabled = true;
+                      label.style.color = "#888"; // Texto en gris
+                      warning.style.display = "inline";
+                      warning.textContent = warningMessage;
                   } else {
-                      checkbox.disabled = false; // Habilita el checkbox
-                      label.style.color = ""; // Devuelve el color normal
-                      warning.style.display = "none"; // Oculta el mensaje
+                      checkbox.disabled = false;
+                      label.style.color = ""; // Color normal
+                      warning.style.display = "none";
                   }
               });
           }
-      
-          // Detectar cambios en la fecha y actualizar la lista
+  
           dateInput.addEventListener("change", updateDependencies);
-      
-          // Ejecutar al cargar la página para aplicar el estado correcto
           updateDependencies();
       });
-    </script>
+    </script>  
   </body>
 </html>

@@ -6,10 +6,14 @@
 
 {% block extra_css %}
   <style>
+    table td {
+      font-size: 15px; /* Reduce el tamaño de las celdas */
+      vertical-align: middle !important;
+    }
     .titulo {
       text-align: center;
       margin-bottom: 30px;
-      font-size: 2rem;
+      font-size: 1.5rem;
       font-weight: bold;
       margin-top: 38px;
     }
@@ -18,15 +22,18 @@
       width: 1%;
     }
     .col-titulo {
-      width: 31%;
+      width: 30%;
     }
     .col-categoria {
-      width: 16.5%;
+      width: 19.5%;
     }
     .col-alianza {
-      width: 14%;
+      width: 11%;
     }
     .col-dependencias {
+      width: 1%;
+    }
+    .col-responsables {
       width: 1%;
     }
     .col-fecha-i {
@@ -86,8 +93,8 @@
     <!-- Filtro de Categoría y botón "Agregar" alineados -->
     <div class="d-flex justify-content-start align-items-center mb-3">
       {% if user.is_superuser %}
-      <!-- Botón para crear una nueva tarea -->
-      <a href="{% url 'task_create' %}" class="btn btn-primary btn-agregar">Agregar Tarea</a>
+        <!-- Botón para crear una nueva tarea -->
+        <a href="{% url 'task_create' %}" class="btn btn-primary btn-agregar">Agregar Tarea</a>
       {% endif %}
 
       <!-- Texto "Filtrar por Categoría" -->
@@ -114,11 +121,12 @@
           <th class="col-categoria text-center">Categoría</th>
           <th class="col-alianza text-center">Alianza</th>
           <th class="col-dependencias text-center">DP</th>
+          <th class="col-responsables text-center">RP</th>
           <th class="col-fecha-i text-center">Fecha de Inicio</th>
           <th class="col-fecha text-center">Fecha de Vencimiento</th>
           <th class="col-estado text-center">Estado</th>
           {% if user.is_superuser %}
-          <th class="col-acciones text-center">Acciones</th>
+            <th class="col-acciones text-center">Acciones</th>
           {% endif %}
         </tr>
       </thead>
@@ -127,27 +135,28 @@
           <tr>
             <td class="text-center">{{ forloop.counter }}</td>  <!-- Aquí se muestra el número -->
             <td class="col-titulo" data-bs-toggle="tooltip" data-bs-placement="top" title="{{ task.description }}">{{ task.title }}</td>
-            <td class="col-categoria" title="
-            {% if task.alianzas_object %}
-                {{ task.alianzas_object.title }}
-            {% elif task.planeacion_object %}
-                {{ task.planeacion_object.title }}
-            {% elif task.estadistica_object %}
-                {{ task.estadistica_object.title }}
-            {% elif task.procesos_object %}
-                {{ task.procesos_object.title }}
-            {% endif %}
-        ">{{ task.get_category_display }}</td>
-            <td class="col-alianza">{{ task.alianza }}</td>
-            <td class="col-dependencias text-center" 
-                {% if task.dependencies.all %}
-                    data-bs-toggle="tooltip" 
-                    title="{% for dependency in task.dependencies.all %}{{ dependency.title }}{% if not forloop.last %}, {% endif %}{% empty %}No tiene dependencias{% endfor %}"
-                {% else %}
-                    title="No tiene dependencias"
-               {% endif %}>
-            {{ task.dependencies.count }}
+            <td class="col-categoria" title="{% if task.alianzas_object or task.planeacion_object or task.estadistica_object or task.procesos_object %}
+            {% if task.alianzas_object %}{{ task.alianzas_object.title }}&#10;{% endif %}
+            {% if task.planeacion_object %}{{ task.planeacion_object.title }}&#10;{% endif %}
+            {% if task.estadistica_object %}{{ task.estadistica_object.title }}&#10;{% endif %}
+            {% if task.procesos_object %}{{ task.procesos_object.title }}{% endif %}
+            {% else %}No hay proyectos relacionados{% endif %}">
+             {{ task.get_category_display }}</td>
+            <td class="col-alianza">
+              {% if task.alianza %}{{ task.alianza }}{% else %}Uniminuto{% endif %}
             </td>
+            <td class="col-dependencias text-center"
+    data-bs-toggle="tooltip"
+    title="{% if task.dependencies.exists %}{% for dependency in task.dependencies.all %}{{ dependency.title }}&#10;{% endfor %}{% else %}No tiene dependencias{% endif %}">
+    {{ task.dependencies.count }}
+</td>
+
+<td class="col-responsables text-center"
+    data-bs-toggle="tooltip"
+    title="{% if task.assigned_users.exists %}{% for user in task.assigned_users.all %}{{ user.get_full_name|default:user.username }}&#10;{% endfor %}{% else %}No tiene responsables{% endif %}">
+    {{ task.assigned_users.count }}
+</td>
+
             <td class="col-fecha-i text-center">{{ task.created_at|date:'d/m/Y' }}</td>
             <td class="col-fecha text-center">{{ task.due_date|date:'d/m/Y' }}</td>
             <td class="text-center align-middle
@@ -159,14 +168,14 @@
                 {{ task.get_status_display }}
             </td>
             {% if user.is_superuser %}
-            <td class="col-acciones text-center">
-              <!-- Botón para editar la tarea -->
-              <a href="{% url 'task_edit' task.pk %}" class="btn btn-success btn-sm" data-task-id="{{ task.pk }}">
-                <i class="bi bi-pencil"></i>
-              </a>
-              <!-- Botón para eliminar la tarea -->
-              <a href="{% url 'task_delete' task.pk %}" class="btn btn-danger btn-sm" onclick="return confirm('¿Estás seguro de que deseas eliminar esta tarea?')"><i class="bi bi-trash3-fill"></i></a>
-            </td>
+              <td class="col-acciones text-center">
+                <!-- Botón para editar la tarea -->
+                <a href="{% url 'task_edit' task.pk %}" class="btn btn-success btn-sm" data-task-id="{{ task.pk }}">
+                  <i class="bi bi-pencil"></i>
+                </a>
+                <!-- Botón para eliminar la tarea -->
+                <a href="{% url 'task_delete' task.pk %}" class="btn btn-danger btn-sm" onclick="return confirm('¿Estás seguro de que deseas eliminar esta tarea?')"><i class="bi bi-trash3-fill"></i></a>
+              </td>
             {% endif %}
           </tr>
         {% empty %}
@@ -181,8 +190,8 @@
     </div>
     <div class="d-flex justify-content-start align-items-center mb-3">
       {% if user.is_superuser %}
-      <!-- Botón para crear una nueva tarea semanal -->
-      <a href="{% url 'WeeklyTask_create' %}" class="btn btn-primary btn-agregar">Agregar Tarea semanal</a>
+        <!-- Botón para crear una nueva tarea semanal -->
+        <a href="{% url 'WeeklyTask_create' %}" class="btn btn-primary btn-agregar">Agregar Tarea semanal</a>
       {% endif %}
       
     </div>
@@ -196,7 +205,7 @@
           <th class="col-revision text-center">revisión</th>
           <th class="col-estado text-center">Estado</th>
           {% if user.is_superuser %}
-          <th class="col-acciones text-center">Acciones</th>
+            <th class="col-acciones text-center">Acciones</th>
           {% endif %}
           
         </tr>
@@ -217,12 +226,11 @@
                 {{ taskw.get_status_display }}
             </td>
             {% if user.is_superuser %}
-            <td class="col-acciones text-center">
-              <!-- Botón para editar la tarea -->
-              <a href="{% url 'weeklytask_edit' taskw.pk %}" class="btn btn-success btn-sm"><i class="bi bi-pencil"></i></a>
-
-              <!-- Botón para eliminar la tarea -->
-              <a href="{% url 'weeklytask_delete' taskw.pk %}" class="btn btn-danger btn-sm" onclick="return confirm('¿Estás seguro de que deseas eliminar esta tarea?')"><i class="bi bi-trash3-fill"></i></a>
+              <td class="col-acciones text-center">
+                <!-- Botón para editar la tarea -->
+                <a href="{% url 'weeklytask_edit' taskw.pk %}" class="btn btn-success btn-sm"><i class="bi bi-pencil"></i></a>
+                <!-- Botón para eliminar la tarea -->
+                <a href="{% url 'weeklytask_delete' taskw.pk %}" class="btn btn-danger btn-sm" onclick="return confirm('¿Estás seguro de que deseas eliminar esta tarea?')"><i class="bi bi-trash3-fill"></i></a>
             </td>
             {% endif %}
           </tr>

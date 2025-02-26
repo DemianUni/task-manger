@@ -119,7 +119,7 @@
     <!-- Barra flotante de opciones en la parte superior derecha -->
     <div class="floating-bar">
       {% if user.is_authenticated %}
-      <i class="bi bi-bell notification-bell" data-bs-toggle="modal" data-bs-target="#notificationModal"><span class="notification-dot"></span> <!-- Punto rojo --></i>
+        <i class="bi bi-bell notification-bell" data-bs-toggle="modal" data-bs-target="#notificationModal"><span class="notification-dot"></span> <!-- Punto rojo --></i>
         <span class="text-white">Hola, {{ user.username }}</span>
         {% if user.is_superuser %}
           <a class="btn btn-outline-danger" href="{% url 'admin:index' %}">admin</a>

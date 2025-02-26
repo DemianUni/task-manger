@@ -1,5 +1,6 @@
 from django import forms
 from .models import Task, WeeklyTask
+from django.contrib.auth.models import User
 from manager.models import (
     AlianzasAñoPresente,
     PlaniacionEstrategiaAñoPresente,
@@ -25,6 +26,7 @@ class TaskForm(forms.ModelForm):
             "planeacion_object",
             "estadistica_object",
             "procesos_object",
+            "assigned_users",
         ]
 
     due_date = forms.DateField(
@@ -46,6 +48,13 @@ class TaskForm(forms.ModelForm):
         choices=Task.MODEL_CHOICES,
         required=False,
         widget=forms.Select(attrs={"class": "form-control"}),
+    )
+
+    assigned_users = forms.ModelMultipleChoiceField(
+        queryset=User.objects.all(),
+        widget=forms.CheckboxSelectMultiple,  # Hace que los usuarios sean checkboxes
+        required=False,
+        label="Usuarios asignados",
     )
 
     alianzas_object = forms.ModelChoiceField(
