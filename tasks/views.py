@@ -107,6 +107,7 @@ def weeklytask_delete(request, pk):
     return redirect("tasks_list")
 
 
+@login_required
 def notifications_view(request):
     tareas = Task.objects.all()
     # Filtrar tareas cuyo status es "overdue"
@@ -136,6 +137,7 @@ import json
 from django.core.serializers.json import DjangoJSONEncoder
 
 
+@login_required
 def gantt_chart(request):
     tasks = Task.objects.all()
 

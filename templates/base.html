@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>
       {% block title %}
-        Mi Sitio Web
+        Tablero
       {% endblock %}
     </title>
     <!-- Vincula el CSS de Bootstrap -->
@@ -118,8 +118,8 @@
   <body>
     <!-- Barra flotante de opciones en la parte superior derecha -->
     <div class="floating-bar">
-      <i class="bi bi-bell notification-bell" data-bs-toggle="modal" data-bs-target="#notificationModal"><span class="notification-dot"></span> <!-- Punto rojo --></i>
       {% if user.is_authenticated %}
+      <i class="bi bi-bell notification-bell" data-bs-toggle="modal" data-bs-target="#notificationModal"><span class="notification-dot"></span> <!-- Punto rojo --></i>
         <span class="text-white">Hola, {{ user.username }}</span>
         {% if user.is_superuser %}
           <a class="btn btn-outline-danger" href="{% url 'admin:index' %}">admin</a>
@@ -129,7 +129,6 @@
         <a href="{% url 'gantt_chart' %}" class="btn btn-outline-info">Ver Gantt</a>
       {% else %}
         <a class="btn btn-outline-primary" href="#" data-bs-toggle="modal" data-bs-target="#loginModal">Iniciar sesión</a>
-        <a href="{% url 'gantt_chart' %}" class="btn btn-outline-info">Ver Gantt</a>
       {% endif %}
     </div>
 
@@ -191,7 +190,7 @@
             const doc = parser.parseFromString(data, 'text/html')
       
             // Verifica si hay tareas vencidas o solapadas
-            const hasNotifications = doc.querySelector('.list-group-item:not(:empty)') !== null && !data.includes('No hay tareas vencidas.') || !data.includes('No hay tareas solapadas.')
+            const hasNotifications = (doc.querySelector('.list-group-item:not(:empty)') !== null && !data.includes('No hay tareas vencidas.')) || !data.includes('No hay tareas solapadas.')
       
             // Guardar el estado en localStorage
             localStorage.setItem('hasNotifications', hasNotifications)

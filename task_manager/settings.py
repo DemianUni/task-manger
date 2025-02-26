@@ -28,7 +28,7 @@ SECRET_KEY = "django-insecure-=q5n8_klfyv*zeb*hqo*$#^^!8-=0v!c(9=1@s2e#kuxy&*72&
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["task-manger-production.up.railway.app"]
+ALLOWED_HOSTS = ["127.0.0.1", "task-manger-production.up.railway.app"]
 CSRF_TRUSTED_ORIGINS = ["https://task-manger-production.up.railway.app"]
 LOGIN_URL = "/menu/"
 
@@ -144,6 +144,8 @@ USE_TZ = True
 STATIC_URL = "static/"
 
 STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
+
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field

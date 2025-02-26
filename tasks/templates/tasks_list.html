@@ -85,8 +85,10 @@
 
     <!-- Filtro de Categoría y botón "Agregar" alineados -->
     <div class="d-flex justify-content-start align-items-center mb-3">
+      {% if user.is_superuser %}
       <!-- Botón para crear una nueva tarea -->
       <a href="{% url 'task_create' %}" class="btn btn-primary btn-agregar">Agregar Tarea</a>
+      {% endif %}
 
       <!-- Texto "Filtrar por Categoría" -->
       <span class="ms-3">Filtrar por Categoría:</span>
@@ -115,7 +117,9 @@
           <th class="col-fecha-i text-center">Fecha de Inicio</th>
           <th class="col-fecha text-center">Fecha de Vencimiento</th>
           <th class="col-estado text-center">Estado</th>
+          {% if user.is_superuser %}
           <th class="col-acciones text-center">Acciones</th>
+          {% endif %}
         </tr>
       </thead>
       <tbody>
@@ -154,15 +158,16 @@
                   {% else %}bg-primary text-white{% endif %}">
                 {{ task.get_status_display }}
             </td>
+            {% if user.is_superuser %}
             <td class="col-acciones text-center">
               <!-- Botón para editar la tarea -->
               <a href="{% url 'task_edit' task.pk %}" class="btn btn-success btn-sm" data-task-id="{{ task.pk }}">
                 <i class="bi bi-pencil"></i>
-            </a>
-
+              </a>
               <!-- Botón para eliminar la tarea -->
               <a href="{% url 'task_delete' task.pk %}" class="btn btn-danger btn-sm" onclick="return confirm('¿Estás seguro de que deseas eliminar esta tarea?')"><i class="bi bi-trash3-fill"></i></a>
             </td>
+            {% endif %}
           </tr>
         {% empty %}
           <tr>
@@ -175,8 +180,11 @@
       <h1>Lista de Tareas semanales</h1>
     </div>
     <div class="d-flex justify-content-start align-items-center mb-3">
+      {% if user.is_superuser %}
       <!-- Botón para crear una nueva tarea semanal -->
-    <a href="{% url 'WeeklyTask_create' %}" class="btn btn-primary btn-agregar">Agregar Tarea semanal</a>
+      <a href="{% url 'WeeklyTask_create' %}" class="btn btn-primary btn-agregar">Agregar Tarea semanal</a>
+      {% endif %}
+      
     </div>
     <!-- Tabla con las tareas semanales -->
     <table class="table table-hover table-bordered">
@@ -187,7 +195,10 @@
           <th class="col-categoria text-center">Categoría</th>
           <th class="col-revision text-center">revisión</th>
           <th class="col-estado text-center">Estado</th>
+          {% if user.is_superuser %}
           <th class="col-acciones text-center">Acciones</th>
+          {% endif %}
+          
         </tr>
       </thead>
       <tbody>
@@ -205,6 +216,7 @@
                   {% else %}bg-primary text-white{% endif %}">
                 {{ taskw.get_status_display }}
             </td>
+            {% if user.is_superuser %}
             <td class="col-acciones text-center">
               <!-- Botón para editar la tarea -->
               <a href="{% url 'weeklytask_edit' taskw.pk %}" class="btn btn-success btn-sm"><i class="bi bi-pencil"></i></a>
@@ -212,6 +224,7 @@
               <!-- Botón para eliminar la tarea -->
               <a href="{% url 'weeklytask_delete' taskw.pk %}" class="btn btn-danger btn-sm" onclick="return confirm('¿Estás seguro de que deseas eliminar esta tarea?')"><i class="bi bi-trash3-fill"></i></a>
             </td>
+            {% endif %}
           </tr>
         {% empty %}
           <tr>

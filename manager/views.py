@@ -20,6 +20,7 @@ from datetime import datetime
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth.decorators import login_required
 
 
 def login_view(request):
@@ -53,6 +54,7 @@ def menu(request):
     return render(request, "menu.html", years)
 
 
+@login_required
 def resultados_año_pasado(request):
     generales = ResultadoAñoPasadoGenerales.objects.all()
     alianzas = ResultadoAñoPasadoAlianzas.objects.all()
@@ -67,6 +69,7 @@ def resultados_año_pasado(request):
     return render(request, "resultados_año_pasado.html", context)
 
 
+@login_required
 def agregar_general(request):
     if request.method == "POST":
         form = ResultadoAPGForm(request.POST)
@@ -75,6 +78,7 @@ def agregar_general(request):
     return redirect("resultados_año_pasado")
 
 
+@login_required
 def agregar_alianza(request):
     if request.method == "POST":
         form = ResultadoAPAForm(request.POST)
@@ -83,6 +87,7 @@ def agregar_alianza(request):
     return redirect("resultados_año_pasado")
 
 
+@login_required
 def editar_general(request, pk):
     general = get_object_or_404(ResultadoAñoPasadoGenerales, pk=pk)
     if request.method == "POST":
@@ -92,6 +97,7 @@ def editar_general(request, pk):
     return redirect("resultados_año_pasado")
 
 
+@login_required
 def eliminar_general(request, pk):
     if request.method == "POST":
         general = get_object_or_404(ResultadoAñoPasadoGenerales, pk=pk)
@@ -99,6 +105,7 @@ def eliminar_general(request, pk):
     return redirect("resultados_año_pasado")
 
 
+@login_required
 def editar_alianza(request, pk):
     alianza = get_object_or_404(ResultadoAñoPasadoAlianzas, pk=pk)
     if request.method == "POST":
@@ -108,6 +115,7 @@ def editar_alianza(request, pk):
     return redirect("resultados_año_pasado")
 
 
+@login_required
 def eliminar_alianza(request, pk):
     if request.method == "POST":
         alianza = get_object_or_404(ResultadoAñoPasadoAlianzas, pk=pk)
@@ -116,12 +124,14 @@ def eliminar_alianza(request, pk):
 
 
 # Vista para la página de Proyectos 2025
+@login_required
 def proyectos_año_presente(request):
     years = get_years()
     return render(request, "proyectos_año_presente.html", years)
 
 
 # Estadistica Informacion
+@login_required
 def estadistica_informacion(request):
     years = get_years()
     estadistica_informacion = EstadisticaInformacionAñoPresente.objects.all()
@@ -140,6 +150,7 @@ def estadistica_informacion(request):
 
 
 # Funciones
+@login_required
 def agregar_estadistica_informacion(request):
     if request.method == "POST":
         form = EstadisticaInformacionAPForm(request.POST)
@@ -148,6 +159,7 @@ def agregar_estadistica_informacion(request):
     return redirect("estadistica_informacion")
 
 
+@login_required
 def editar_estadistica_informacion(request, pk):
     estadistica_informacion = get_object_or_404(
         EstadisticaInformacionAñoPresente, pk=pk
@@ -161,6 +173,7 @@ def editar_estadistica_informacion(request, pk):
     return redirect("estadistica_informacion")
 
 
+@login_required
 def eliminar_estadistica_informacion(request, pk):
     if request.method == "POST":
         estadistica_informacion = get_object_or_404(
@@ -171,6 +184,7 @@ def eliminar_estadistica_informacion(request, pk):
 
 
 # Planeacion Estrategia
+@login_required
 def planeacion_estrategia(request):
     years = get_years()
     tasks_planeacion_estrategia = Task.objects.filter(category="planeacion_estrategia")
@@ -187,6 +201,7 @@ def planeacion_estrategia(request):
 
 
 # Funciones
+@login_required
 def agregar_planeacion_estrategia(request):
     if request.method == "POST":
         form = PlaniacionEstrategiaAPForm(request.POST)
@@ -195,6 +210,7 @@ def agregar_planeacion_estrategia(request):
     return redirect("planeacion_estrategia")
 
 
+@login_required
 def editar_planeacion_estrategia(request, pk):
     planeacion_estrategia = get_object_or_404(PlaniacionEstrategiaAñoPresente, pk=pk)
     if request.method == "POST":
@@ -204,6 +220,7 @@ def editar_planeacion_estrategia(request, pk):
     return redirect("planeacion_estrategia")
 
 
+@login_required
 def eliminar_planeacion_estrategia(request, pk):
     if request.method == "POST":
         planeacion_estrategia = get_object_or_404(
@@ -214,6 +231,7 @@ def eliminar_planeacion_estrategia(request, pk):
 
 
 # Procesos /R
+@login_required
 def procesos_r(request):
     years = get_years()
     procesos_r = ProcesosRAñoPresente.objects.all()
@@ -226,6 +244,7 @@ def procesos_r(request):
 
 
 # Funciones
+@login_required
 def agregar_procesos_r(request):
     if request.method == "POST":
         form = ProcesosRAPForm(request.POST)
@@ -234,6 +253,7 @@ def agregar_procesos_r(request):
     return redirect("procesos_r")
 
 
+@login_required
 def editar_procesos_r(request, pk):
     procesos_r = get_object_or_404(ProcesosRAñoPresente, pk=pk)
     if request.method == "POST":
@@ -243,6 +263,7 @@ def editar_procesos_r(request, pk):
     return redirect("procesos_r")
 
 
+@login_required
 def eliminar_procesos_r(request, pk):
     if request.method == "POST":
         procesos_r = get_object_or_404(ProcesosRAñoPresente, pk=pk)
@@ -251,6 +272,7 @@ def eliminar_procesos_r(request, pk):
 
 
 # Alianzas
+@login_required
 def alianzas(request):
     years = get_years()
     tasks_alianzas = Task.objects.filter(category="alianzas")
@@ -264,6 +286,7 @@ def alianzas(request):
 
 
 # Funciones
+@login_required
 def agregar_alianza_presente(request):
     if request.method == "POST":
         form = AlianzasAPForm(request.POST)
@@ -272,6 +295,7 @@ def agregar_alianza_presente(request):
     return redirect("alianzas")
 
 
+@login_required
 def editar_alianza_presente(request, pk):
     alianza = get_object_or_404(AlianzasAñoPresente, pk=pk)
     if request.method == "POST":
@@ -281,6 +305,7 @@ def editar_alianza_presente(request, pk):
     return redirect("alianzas")
 
 
+@login_required
 def eliminar_alianza_presente(request, pk):
     if request.method == "POST":
         alianza = get_object_or_404(AlianzasAñoPresente, pk=pk)
