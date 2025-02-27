@@ -1,19 +1,11 @@
 {% extends 'base.html' %}
 
 {% block title %}
-  Alianzas - {{ years.current_year }}
+  Alianzas
 {% endblock %}
 
 {% block content %}
   <style>
-    .titulo {
-      text-align: center;
-      margin-bottom: 30px;
-      font-size: 2.5rem;
-      font-weight: bold;
-      margin-top: 38px;
-    }
-    
     .lista-container {
       margin-bottom: 40px;
     }
@@ -26,23 +18,23 @@
     }
     
     .list-group-item {
-      font-size: 1.2rem;
+      font-size: 1.1rem;
     }
     
     .table th:nth-child(1) {
-      width: 47%;
+      width: 50.5%;
     }
     
     .table th:nth-child(2) {
-      width: 17%;
+      width: 18.5%;
     }
     
     .table th:nth-child(3) {
-      width: 16%;
+      width: 3.9%;
     }
     
     .table th:nth-child(4) {
-      width: 20%;
+      width: 27.2%;
     }
     
     .add-button {
@@ -60,88 +52,125 @@
       text-align: right;
       margin-right: 10px;
     }
+    .custom-title {
+      background-color: #172645ff;
+      padding: 5px;
+      border-radius: 8px;
+      clip-path: polygon(0 100%, 100% 100%, 90% 0, 10% 0);
+    }
+    table td {
+      font-size: 14.5px;
+      vertical-align: middle !important;
+    }
+    table th {
+      vertical-align: middle !important;
+    }
   </style>
-  <div class="container">
-    <a href="{% url 'proyectos_año_presente' %}" class="btn btn-primary"><i class="bi bi-arrow-left"></i></a>
-    <!-- Título principal -->
-    <div class="titulo">
-      <h1>Proyectos {{ years.current_year }}</h1>
-    </div>
 
-    <!-- Lista de Alianzas -->
-    <div class="row">
-      <!-- Left Column -->
-      <div class="col-md-5">
-        <div class="lista-container lista" style="flex: 1; padding: 20px; border-radius: 8px; background-color: #f8f9fa; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
-          <h4>Alianzas</h4>
-          <ul class="list-group">
-            {% for alianza in alianzas %}
-              <li class="list-group-item d-flex justify-content-between align-items-center">
-                <strong class="numero-item me-3">{{ forloop.counter }}.</strong>
-                <div title="{{ alianza.description }}" class="flex-grow-1">{{ alianza.title }}</div>
-                <div class="btn-group btn-group-sm">
-                  {% if user.is_authenticated and user.is_superuser %}
-                    <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#editAlianzaModal{{ alianza.id }}"><i class="bi bi-pencil"></i></button>
-                    <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteAlianzaModal{{ alianza.id }}"><i class="bi bi-trash3-fill"></i></button>
-                  {% endif %}
-                </div>
-              </li>
-            {% empty %}
-              <li class="list-group-item text-center">No hay proyectos</li>
-            {% endfor %}
-          </ul>
-          <div class="add-button">
-            {% if user.is_authenticated and user.is_superuser %}
-              <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#modalAlianzas">Agregar Proyecto</button>
-            {% endif %}
-          </div>
+  <a href="{% url 'proyectos_año_presente' %}" class="btn" style="background-color: #004b94;"><i class="bi bi-arrow-left text-white"></i></a>
+  <!-- Lista de Alianzas -->
+  <div class="row">
+    <!-- Left Column -->
+    <div class="col-md-5">
+      <div class="lista-container lista" style="flex: 1; padding: 20px; padding-top: 0; padding-right: 10px; background-color: white;">
+        <h4 class="custom-title text-white">Proyectos</h4>
+        <ul class="list-group">
+          {% for alianza in alianzas %}
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              <strong class="numero-item me-3">{{ forloop.counter }}.</strong>
+              <div title="{{ alianza.description }}" class="flex-grow-1">{{ alianza.title }}</div>
+              <div class="btn-group btn-group-sm">
+                {% if user.is_authenticated and user.is_superuser %}
+                  <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#editAlianzaModal{{ alianza.id }}"><i class="bi bi-pencil"></i></button>
+                  <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteAlianzaModal{{ alianza.id }}"><i class="bi bi-trash3-fill"></i></button>
+                {% endif %}
+              </div>
+            </li>
+          {% empty %}
+            <li class="list-group-item text-center">No hay proyectos</li>
+          {% endfor %}
+        </ul>
+        <div class="add-button">
+          {% if user.is_authenticated and user.is_superuser %}
+            <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#modalAlianzas">Agregar Proyecto</button>
+          {% endif %}
         </div>
       </div>
+    </div>
 
-      <!-- Right Column -->
-      <div class="col-md-7">
-        <div class="lista-container lista">
-          <h4>Resultados Esperados</h4>
-          <table class="table table-bordered">
-            <thead>
+    <!-- Right Column -->
+    <div class="col-md-7">
+      <div class="lista-container lista me-3 mt-0 mb-2">
+        <h4 class="custom-title text-white">Resultados Esperados</h4>
+        <table class="table table-bordered">
+          <thead>
+            <tr>
+              <th class="text-center">Título</th>
+              <th class="text-center">Alianza</th>
+              <th class="text-center">Fecha de Vencimiento</th>
+              <th class="text-center">Estado</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for task in tasks_alianzas %}
               <tr>
-                <th class="text-center">Título</th>
-                <th class="text-center">Alianza</th>
-                <th class="text-center">Fecha de Vencimiento</th>
-                <th class="text-center">Estado</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for task in tasks_alianzas %}
-                <tr>
-                  <td class="col-titulo" data-bs-toggle="tooltip" data-bs-placement="top" title="{{ task.description }}">{{ task.title }}</td>
-                  <td>{{ task.alianza }}</td>
-                  <td class="text-center">{{ task.due_date|date:'d/m/Y' }}</td>
-                  <td class="text-center align-middle
+                <td class="col-titulo" data-bs-toggle="tooltip" data-bs-placement="top" title="{{ task.description }}">{{ task.title }}</td>
+                <td>{{ task.alianza }}</td>
+                <td class="text-center">{{ task.due_date|date:'d/m/Y' }}</td>
+                <td class="text-center align-middle
                           {% if task.status == 'completed' %}
+                    
+                    
+                    
                       bg-success text-white
 
-                    {% elif task.status == 'overdue' %}
+
+
+
+                  {% elif task.status == 'overdue' %}
+                    
+                    
+                    
                       bg-danger text-white
 
-                    {% elif task.status == 'due_soon' %}
+
+
+
+                  {% elif task.status == 'due_soon' %}
+                    
+                    
+                    
                       bg-warning text-dark
 
-                    {% elif task.status == 'in_progress' %}
+
+
+
+                  {% elif task.status == 'in_progress' %}
+                    
+                    
+                    
                       bg-secondary text-white
 
-                    {% else %}
+
+
+
+                  {% else %}
+                    
+                    
+                    
                       bg-primary text-white
-                    {% endif %}">{{ task.get_status_display }}</td>
-                </tr>
-              {% empty %}
-                <tr>
-                  <td colspan="6" class="text-center">No hay tareas asociadas a alianzas.</td>
-                </tr>
-              {% endfor %}
-            </tbody>
-          </table>
-        </div>
+
+
+
+                  {% endif %}">{{ task.get_status_display }}</td>
+              </tr>
+            {% empty %}
+              <tr>
+                <td colspan="6" class="text-center">No hay tareas asociadas a alianzas.</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
       </div>
     </div>
   </div>

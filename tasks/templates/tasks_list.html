@@ -76,16 +76,10 @@
 {% endblock %}
 
 {% block content %}
-  <div class="container">
-    <a href="{% url 'menu' %}" class="btn btn-primary"><i class="bi bi-arrow-left"></i></a>
-
-    <!-- Título principal -->
-    <div class="titulo">
-      <h1>Lista de Tareas</h1>
-    </div>
     <!-- Formulario de búsqueda -->
     <form method="get" class="d-flex mb-3">
-      <input type="text" name="search" class="form-control me-2" placeholder="Buscar por nombre..."
+      <a href="{% url 'menu' %}" class="btn" style="background-color: #004b94;"><i class="bi bi-arrow-left text-white"></i></a>
+      <input type="text" name="search" class="form-control me-2 ms-3 w-50" placeholder="Buscar por nombre..."
              value="{{ search_query }}">
       <button type="submit" class="btn btn-primary">Buscar</button>
     </form>
@@ -241,7 +235,7 @@
         {% endfor %}
       </tbody>
     </table>
-  </div>
+  
   <!-- Inicializa los tooltips -->
   <script>
     var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))

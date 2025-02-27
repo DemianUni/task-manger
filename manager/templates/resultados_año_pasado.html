@@ -11,21 +11,21 @@
       margin-bottom: 45px;
       font-size: 2rem;
       font-weight: bold;
-      margin-top: 38px;
     }
     
     .list-container {
       display: flex;
       justify-content: space-between;
       gap: 30px;
+      width: 100%;
     }
     
     .lista {
       flex: 1;
       padding: 20px;
+      padding-top: 0;
       border-radius: 8px;
-      background-color: #f8f9fa;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      background-color: white;
     }
     
     .lista h4 {
@@ -38,12 +38,6 @@
     .list-group-item {
       font-size: 1.1rem;
     }
-    
-    .volver-btn {
-      margin-top: 30px;
-      text-align: center;
-    }
-    
     .add-button {
       margin-top: 20px;
       text-align: center;
@@ -58,227 +52,230 @@
       text-align: right;
       margin-right: 10px;
     }
+    .custom-title {
+      background-color: #172645ff;
+      padding: 5px;
+      border-radius: 8px;
+      clip-path: polygon(0 100%, 100% 100%, 90% 0, 10% 0);
+
+    }
   </style>
 {% endblock %}
-
+<!-- Título principal -->
+<div class="titulo">
+  <h1>Resultados {{ last_year }}</h1>
+</div>
 {% block content %}
-  <a href="{% url 'menu' %}" class="btn btn-primary"><i class="bi bi-arrow-left"></i></a>
-  <div class="container contenedor">
-    <!-- Título principal -->
-    <div class="titulo">
-      <h1>Resultados {{ last_year }}</h1>
+  <a href="{% url 'menu' %}" class="btn" style="background-color: #004b94;"><i class="bi bi-arrow-left text-white"></i></a>
+  <!-- Contenedor para las dos listas -->
+  <div class="list-container mb-1">
+    <!-- Lista de Generales -->
+    <div class="lista">
+      <h4 class="text-white custom-title">Generales</h4>
+      <ul class="list-group">
+        {% for general in generales %}
+          <li class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+            <strong class="numero-item me-3">{{ forloop.counter }}.</strong>
+            <div title="{{ general.description }}" class="flex-grow-1">{{ general.title }}</div>
+            {% if user.is_authenticated and user.is_superuser %}
+              <div class="btn-group btn-group-sm">
+                <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#editGeneralModal{{ general.id }}"><i class="bi bi-pencil"></i></button>
+                <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteGeneralModal{{ general.id }}"><i class="bi bi-trash3-fill"></i></button>
+              </div>
+            {% endif %}
+          </li>
+        {% endfor %}
+      </ul>
+      {% if user.is_authenticated and user.is_superuser %}
+        <div class="add-button">
+          <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#modalGenerales">Agregar</button>
+        </div>
+      {% endif %}
     </div>
 
-    <!-- Contenedor para las dos listas -->
-    <div class="list-container mb-4">
-      <!-- Lista de Generales -->
-      <div class="lista">
-        <h4>Generales</h4>
-        <ul class="list-group">
-          {% for general in generales %}
-            <li class="list-group-item d-flex justify-content-between align-items-center">
-              <strong class="numero-item me-3">{{ forloop.counter }}.</strong>
-              <div title="{{ general.description }}" class="flex-grow-1">{{ general.title }}</div>
-              {% if user.is_authenticated and user.is_superuser %}
-                <div class="btn-group btn-group-sm">
-                  <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#editGeneralModal{{ general.id }}"><i class="bi bi-pencil"></i></button>
-                  <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteGeneralModal{{ general.id }}"><i class="bi bi-trash3-fill"></i></button>
-                </div>
-              {% endif %}
-            </li>
-          {% endfor %}
-        </ul>
-        {% if user.is_authenticated and user.is_superuser %}
-          <div class="add-button">
-            <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#modalGenerales">Agregar</button>
-          </div>
-        {% endif %}
-      </div>
-
-      <!-- Lista de Alianzas -->
-      <div class="lista">
-        <h4>Alianzas</h4>
-        <ul class="list-group">
-          {% for alianza in alianzas %}
-            <li class="list-group-item d-flex justify-content-between align-items-center">
-              <strong class="numero-item me-3">{{ forloop.counter }}.</strong>
-              <div title="{{ alianza.description }}" class="flex-grow-1">{{ alianza.title }}</div>
-              {% if user.is_authenticated and user.is_superuser %}
-                <div class="btn-group btn-group-sm">
-                  <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#editAlianzaModal{{ alianza.id }}"><i class="bi bi-pencil"></i></button>
-                  <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteAlianzaModal{{ alianza.id }}"><i class="bi bi-trash3-fill"></i></button>
-                </div>
-              {% endif %}
-            </li>
-          {% endfor %}
-        </ul>
-        {% if user.is_authenticated and user.is_superuser %}
-          <div class="add-button">
-            <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#modalAlianzas">Agregar</button>
-          </div>
-        {% endif %}
-      </div>
+    <!-- Lista de Alianzas -->
+    <div class="lista">
+      <h4 class="text-white custom-title">Alianzas</h4>
+      <ul class="list-group">
+        {% for alianza in alianzas %}
+          <li class="list-group-item d-flex justify-content-between align-items-center">
+            <strong class="numero-item me-3">{{ forloop.counter }}.</strong>
+            <div title="{{ alianza.description }}" class="flex-grow-1">{{ alianza.title }}</div>
+            {% if user.is_authenticated and user.is_superuser %}
+              <div class="btn-group btn-group-sm">
+                <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#editAlianzaModal{{ alianza.id }}"><i class="bi bi-pencil"></i></button>
+                <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteAlianzaModal{{ alianza.id }}"><i class="bi bi-trash3-fill"></i></button>
+              </div>
+            {% endif %}
+          </li>
+        {% endfor %}
+      </ul>
+      {% if user.is_authenticated and user.is_superuser %}
+        <div class="add-button">
+          <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#modalAlianzas">Agregar</button>
+        </div>
+      {% endif %}
     </div>
-    <!-- Modal para Agregar General -->
-    <div class="modal fade" id="modalGenerales" tabindex="-1" aria-labelledby="modalGeneralesLabel" aria-hidden="true">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="modalGeneralesLabel">Crear Resultado General</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <form method="post" action="{% url 'agregar_general' %}">
-            {% csrf_token %}
-            <div class="modal-body">
-              <div class="mb-3">
-                <label for="title" class="form-label">Título</label>
-                <input type="text" class="form-control" id="title" name="title" required />
-              </div>
-              <div class="mb-3">
-                <label for="description" class="form-label">Descripción</label>
-                <textarea class="form-control" id="description" name="description" rows="3"></textarea>
-              </div>
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-              <button type="submit" class="btn btn-primary">Guardar</button>
-            </div>
-          </form>
-        </div>
-      </div>
-    </div>
-
-    <!-- Modal para Agregar Alianza -->
-    <div class="modal fade" id="modalAlianzas" tabindex="-1" aria-labelledby="modalAlianzasLabel" aria-hidden="true">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="modalAlianzasLabel">Nueva Alianza</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <form method="post" action="{% url 'agregar_alianza' %}">
-            {% csrf_token %}
-            <div class="modal-body">
-              <div class="mb-3">
-                <label for="title" class="form-label">Título</label>
-                <input type="text" class="form-control" id="title" name="title" required />
-              </div>
-              <div class="mb-3">
-                <label for="description" class="form-label">Descripción</label>
-                <textarea class="form-control" id="description" name="description" rows="3"></textarea>
-              </div>
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-              <button type="submit" class="btn btn-primary">Guardar</button>
-            </div>
-          </form>
-        </div>
-      </div>
-    </div>
-
-    <!-- Modales de Edición y Eliminación para Generales -->
-    {% for general in generales %}
-      <!-- Modal de Edición para cada objetivo general -->
-      <div class="modal fade" id="editGeneralModal{{ general.id }}" tabindex="-1">
-        <div class="modal-dialog">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title">Editar Objetivo General</h5>
-              <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <form method="post" action="{% url 'editar_general' general.id %}">
-              {% csrf_token %}
-              <div class="modal-body">
-                <div class="mb-3">
-                  <label for="title" class="form-label">Título</label>
-                  <input type="text" class="form-control" name="title" value="{{ general.title }}" required />
-                </div>
-                <div class="mb-3">
-                  <label for="description" class="form-label">Descripción</label>
-                  <textarea class="form-control" name="description">{{ general.description }}</textarea>
-                </div>
-              </div>
-              <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <button type="submit" class="btn btn-primary">Guardar cambios</button>
-              </div>
-            </form>
-          </div>
-        </div>
-      </div>
-
-      <!-- Modal de Eliminación para cada objetivo general -->
-      <div class="modal fade" id="deleteGeneralModal{{ general.id }}" tabindex="-1">
-        <div class="modal-dialog">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title">Confirmar Eliminación</h5>
-              <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">¿Está seguro de que desea eliminar el objetivo "{{ general.title }}"?</div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-              <form method="post" action="{% url 'eliminar_general' general.id %}" style="display: inline;">
-                {% csrf_token %}
-                <button type="submit" class="btn btn-danger">Eliminar</button>
-              </form>
-            </div>
-          </div>
-        </div>
-      </div>
-    {% endfor %}
-
-    <!-- Modales de Edición y Eliminación para Alianzas -->
-    {% for alianza in alianzas %}
-      <!-- Modal de Edición para cada alianza -->
-      <div class="modal fade" id="editAlianzaModal{{ alianza.id }}" tabindex="-1">
-        <div class="modal-dialog">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title">Editar Alianza</h5>
-              <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <form method="post" action="{% url 'editar_alianza' alianza.id %}">
-              {% csrf_token %}
-              <div class="modal-body">
-                <div class="mb-3">
-                  <label for="title" class="form-label">Título</label>
-                  <input type="text" class="form-control" name="title" value="{{ alianza.title }}" required />
-                </div>
-                <div class="mb-3">
-                  <label for="description" class="form-label">Descripción</label>
-                  <textarea class="form-control" name="description">{{ alianza.description }}</textarea>
-                </div>
-              </div>
-              <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <button type="submit" class="btn btn-primary">Guardar cambios</button>
-              </div>
-            </form>
-          </div>
-        </div>
-      </div>
-
-      <!-- Modal de Eliminación para cada alianza -->
-      <div class="modal fade" id="deleteAlianzaModal{{ alianza.id }}" tabindex="-1">
-        <div class="modal-dialog">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title">Confirmar Eliminación</h5>
-              <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">¿Está seguro de que desea eliminar la alianza "{{ alianza.title }}"?</div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-              <form method="post" action="{% url 'eliminar_alianza' alianza.id %}" style="display: inline;">
-                {% csrf_token %}
-                <button type="submit" class="btn btn-danger">Eliminar</button>
-              </form>
-            </div>
-          </div>
-        </div>
-      </div>
-    {% endfor %}
   </div>
+  <!-- Modal para Agregar General -->
+  <div class="modal fade" id="modalGenerales" tabindex="-1" aria-labelledby="modalGeneralesLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modalGeneralesLabel">Crear Resultado General</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <form method="post" action="{% url 'agregar_general' %}">
+          {% csrf_token %}
+          <div class="modal-body">
+            <div class="mb-3">
+              <label for="title" class="form-label">Título</label>
+              <input type="text" class="form-control" id="title" name="title" required />
+            </div>
+            <div class="mb-3">
+              <label for="description" class="form-label">Descripción</label>
+              <textarea class="form-control" id="description" name="description" rows="3"></textarea>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            <button type="submit" class="btn btn-primary">Guardar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal para Agregar Alianza -->
+  <div class="modal fade" id="modalAlianzas" tabindex="-1" aria-labelledby="modalAlianzasLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modalAlianzasLabel">Nueva Alianza</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <form method="post" action="{% url 'agregar_alianza' %}">
+          {% csrf_token %}
+          <div class="modal-body">
+            <div class="mb-3">
+              <label for="title" class="form-label">Título</label>
+              <input type="text" class="form-control" id="title" name="title" required />
+            </div>
+            <div class="mb-3">
+              <label for="description" class="form-label">Descripción</label>
+              <textarea class="form-control" id="description" name="description" rows="3"></textarea>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            <button type="submit" class="btn btn-primary">Guardar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modales de Edición y Eliminación para Generales -->
+  {% for general in generales %}
+    <!-- Modal de Edición para cada objetivo general -->
+    <div class="modal fade" id="editGeneralModal{{ general.id }}" tabindex="-1">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Editar Objetivo General</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <form method="post" action="{% url 'editar_general' general.id %}">
+            {% csrf_token %}
+            <div class="modal-body">
+              <div class="mb-3">
+                <label for="title" class="form-label">Título</label>
+                <input type="text" class="form-control" name="title" value="{{ general.title }}" required />
+              </div>
+              <div class="mb-3">
+                <label for="description" class="form-label">Descripción</label>
+                <textarea class="form-control" name="description">{{ general.description }}</textarea>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+              <button type="submit" class="btn btn-primary">Guardar cambios</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal de Eliminación para cada objetivo general -->
+    <div class="modal fade" id="deleteGeneralModal{{ general.id }}" tabindex="-1">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Confirmar Eliminación</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">¿Está seguro de que desea eliminar el objetivo "{{ general.title }}"?</div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+            <form method="post" action="{% url 'eliminar_general' general.id %}" style="display: inline;">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-danger">Eliminar</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  {% endfor %}
+
+  <!-- Modales de Edición y Eliminación para Alianzas -->
+  {% for alianza in alianzas %}
+    <!-- Modal de Edición para cada alianza -->
+    <div class="modal fade" id="editAlianzaModal{{ alianza.id }}" tabindex="-1">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Editar Alianza</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <form method="post" action="{% url 'editar_alianza' alianza.id %}">
+            {% csrf_token %}
+            <div class="modal-body">
+              <div class="mb-3">
+                <label for="title" class="form-label">Título</label>
+                <input type="text" class="form-control" name="title" value="{{ alianza.title }}" required />
+              </div>
+              <div class="mb-3">
+                <label for="description" class="form-label">Descripción</label>
+                <textarea class="form-control" name="description">{{ alianza.description }}</textarea>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+              <button type="submit" class="btn btn-primary">Guardar cambios</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal de Eliminación para cada alianza -->
+    <div class="modal fade" id="deleteAlianzaModal{{ alianza.id }}" tabindex="-1">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Confirmar Eliminación</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">¿Está seguro de que desea eliminar la alianza "{{ alianza.title }}"?</div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+            <form method="post" action="{% url 'eliminar_alianza' alianza.id %}" style="display: inline;">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-danger">Eliminar</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  {% endfor %}
 {% endblock %}

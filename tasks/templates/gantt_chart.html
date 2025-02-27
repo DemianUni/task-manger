@@ -1,14 +1,10 @@
 {% extends 'base.html' %}
+{% block title %}
+  Diagrama Gantt
+{% endblock %}
 
 {% block content %}
   <style>
-    .titulo {
-      text-align: center;
-      margin-bottom: 30px;
-      font-size: 2.5rem;
-      font-weight: bold;
-      margin-top: 38px;
-    }
     .overdue-list {
       margin-top: 40px;
     }
@@ -21,25 +17,27 @@
       height: auto !important;
       min-height: 400px;
     }
+    .custom-title {
+      background-color: #172645ff;
+      padding: 5px;
+      border-radius: 5px;
+      clip-path: polygon(0 100%, 100% 100%, 95% 0, 5% 0);
+      text-align: center;
+    }
   </style>
 
-  <a href="{% url 'menu' %}" class="btn btn-primary"><i class="bi bi-arrow-left"></i></a>
+  <a href="{% url 'menu' %}" class="btn" style="background-color: #004b94;"><i class="bi bi-arrow-left text-white"></i></a>
+  <div class="mt-4" id="chart_div"></div>
 
-  <div class="titulo">
-    <h1>Diagrama de Gantt de Tareas</h1>
-  </div>
-
-  <div id="chart_div"></div>
-
-  <div class="container mt-4 mb-5">
-    <h1 class="mb-4">Tareas Semanales</h1>
+  <div class="mt-4 mb-0">
+    <h1 class="mb-4 custom-title text-white">Tareas Semanales</h1>
     <div class="table-responsive">
-      <table class="table table-hover table-bordered">
-        <thead class="table-dark">
-          <tr>
+      <table class="table table-hover table-bordered mb-0">
+        <thead style="background-color: #004b94;;">
+          <tr class="text-white">
             <th scope="col" class="text-center">ID</th>
             <th scope="col">Título</th>
-            <th scope="col">Categoría</th>
+            <th scope="col">Area</th>
             <th scope="col">Estado</th>
             <th scope="col">Revisión</th>
           </tr>
@@ -50,29 +48,49 @@
               <td class="text-center">{{ forloop.counter }}</td>
               <td title="{{ task.description }}">{{ task.title }}</td>
               <td>{{ task.get_category_display }}</td>
+              <td>{{ task.get_evaluation_day_display }}</td>
               <td class="text-center align-middle
                           {% if task.status == 'completed' %}
                   
+                  
+                  
                   bg-success text-white
+
+
 
                 {% elif task.status == 'overdue' %}
                   
+                  
+                  
                   bg-danger text-white
+
+
 
                 {% elif task.status == 'due_soon' %}
                   
+                  
+                  
                   bg-warning text-dark
+
+
 
                 {% elif task.status == 'in_progress' %}
                   
+                  
+                  
                   bg-secondary text-white
+
+
 
                 {% else %}
                   
+                  
+                  
                   bg-primary text-white
 
+
+
                 {% endif %}">{{ task.get_status_display }}</td>
-              <td>{{ task.get_evaluation_day_display }}</td>
             </tr>
           {% empty %}
             <tr>

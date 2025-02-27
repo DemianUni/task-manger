@@ -1,40 +1,39 @@
 <!-- notificaciones.html -->
-<div class="container">
-  <div class="row">
-    <!-- Columna para tareas vencidas -->
-    <div class="col-md-6">
-      <h2>Tareas Vencidas</h2>
-      <ul class="list-group">
-        {% if overdue_tasks %}
-          {% for task in overdue_tasks %}
-            <li class="list-group-item">
-              <strong>{{ task.title }} |</strong>
-              <span class="text-info">{{ task.get_category_display }}</span><br />
-              <span class="text-danger">Vencida</span><br />
-              <small>{{ task.due_date|date:'d-m-Y' }}</small>
-            </li>
-          {% endfor %}
-        {% else %}
-          <li class="list-group-item">No hay tareas vencidas.</li>
-        {% endif %}
-      </ul>
-    </div>
 
-    <!-- Columna para tareas solapadas -->
-    <div class="col-md-6">
-      <h2>Tareas Solapadas</h2>
-      <ul class="list-group">
-        {% if overlapping_tasks %}
-          {% for task, other_task in overlapping_tasks %}
-            <li class="list-group-item">
-              <strong>{{ task.title }}</strong> se solapa con <strong>{{ other_task.title }}</strong><br />
-              <small>Fechas: {{ task.due_date|date:'d-m-Y' }} y {{ other_task.due_date|date:'d-m-Y' }}</small>
-            </li>
-          {% endfor %}
-        {% else %}
-          <li class="list-group-item">No hay tareas solapadas.</li>
-        {% endif %}
-      </ul>
-    </div>
+<div class="row">
+  <!-- Columna para tareas vencidas -->
+  <div class="col-md-6">
+    <h2>Tareas Vencidas</h2>
+    <ul class="list-group">
+      {% if overdue_tasks %}
+        {% for task in overdue_tasks %}
+          <li class="list-group-item">
+            <strong>{{ task.title }} |</strong>
+            <span class="text-info">{{ task.get_category_display }}</span><br />
+            <span class="text-danger">Vencida</span><br />
+            <small>{{ task.due_date|date:'d-m-Y' }}</small>
+          </li>
+        {% endfor %}
+      {% else %}
+        <li class="list-group-item">No hay tareas vencidas.</li>
+      {% endif %}
+    </ul>
+  </div>
+
+  <!-- Columna para tareas solapadas -->
+  <div class="col-md-6">
+    <h2>Tareas Solapadas</h2>
+    <ul class="list-group">
+      {% if overlapping_tasks %}
+        {% for task, other_task in overlapping_tasks %}
+          <li class="list-group-item">
+            <strong>{{ task.title }}</strong> se solapa con <strong>{{ other_task.title }}</strong><br />
+            <small>Fechas: {{ task.due_date|date:'d-m-Y' }} y {{ other_task.due_date|date:'d-m-Y' }}</small>
+          </li>
+        {% endfor %}
+      {% else %}
+        <li class="list-group-item">No hay tareas solapadas.</li>
+      {% endif %}
+    </ul>
   </div>
 </div>
