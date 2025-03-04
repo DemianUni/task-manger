@@ -1,392 +1,375 @@
-<!DOCTYPE html>
-<html lang="es">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>
-      {% if form.instance.pk %}
-        Editar
-      {% else %}
-        Crear
-      {% endif %}Tarea
-    </title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" />
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet" />
-  </head>
-  <body>
-    <div class="container mt-4">
-      <a href="{% url 'tasks_list' %}" style="margin-left: 12px;" class="btn btn-primary"><i class="bi bi-arrow-left"></i></a>
-      <h1 class="mb-5 text-center">
-        {% if form.instance.pk %}
-          Editar
-        {% else %}
-          Crear
-        {% endif %}Tarea
-      </h1>
-      <div class="row justify-content-center">
-        <div class="col-md-12 col-lg-12">
-          <!-- Formulario -->
-          <form method="POST" id="task-form">
-            {% csrf_token %}
-            <div class="mb-3 bg-light p-3 rounded">
-              <div class="row">
-                <div class="col-md-6">
-                  
-                  <div class="mb-3">
-                    <!-- Título -->
-                    <label for="title" class="form-label">Título:</label>
-                  <input type="text" class="form-control" id="title" name="title" value="{{ form.title.value|default:'' }}" />
-                  {% if form.title.errors %}
-                    <div class="text-danger">
-                      {% for error in form.title.errors %}
-                        <p>{{ error }}</p>
-                      {% endfor %}
-                    </div>
-                  {% endif %}
-                  </div>
-                  <div class="mb-3">
-                    <!-- Descripción -->
-                    <label for="description" class="form-label">Descripción:</label>
-                  <textarea class="form-control" id="description" name="description" rows="4">{{ form.description.value|default:'' }}</textarea>
-                  {% if form.description.errors %}
-                    <div class="text-danger">
-                      {% for error in form.description.errors %}
-                        <p>{{ error }}</p>
-                      {% endfor %}
-                    </div>
-                  {% endif %}
-                  </div>
+{% extends 'base.html' %}
+{% block title %}
+  {% if form.instance.pk %}
+    Editar
+  {% else %}
+    Crear
+  {% endif %}Tarea
+{% endblock %}
+
+{% block content %}
+<a href="{% url 'tasks_list' %}" style="background-color: #004b94;"class="btn btn-primary"><i class="bi bi-arrow-left"></i></a>
+<div class="row justify-content-center">
+  <div class="col-md-12 col-lg-12">
+    <!-- Formulario -->
+    <form method="POST" id="task-form">
+      {% csrf_token %}
+      <div class="mb-3 p-3 rounded">
+        <div class="row">
+          <div class="col-md-6">
+            
+            <div class="mb-3">
+              <!-- Título -->
+              <label for="title" class="form-label">Título:</label>
+            <input type="text" class="form-control" id="title" name="title" value="{{ form.title.value|default:'' }}" />
+            {% if form.title.errors %}
+              <div class="text-danger">
+                {% for error in form.title.errors %}
+                  <p>{{ error }}</p>
+                {% endfor %}
+              </div>
+            {% endif %}
+            </div>
+            <div class="mb-3">
+              <!-- Descripción -->
+              <label for="description" class="form-label">Descripción:</label>
+            <textarea class="form-control" id="description" name="description" rows="4">{{ form.description.value|default:'' }}</textarea>
+            {% if form.description.errors %}
+              <div class="text-danger">
+                {% for error in form.description.errors %}
+                  <p>{{ error }}</p>
+                {% endfor %}
+              </div>
+            {% endif %}
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="mb-3">
+              <label for="created_at" class="form-label">Fecha de creación:</label>
+              <input type="date" class="form-control" id="created_at" name="created_at" 
+                     value="{{ form.created_at.value|default:''|date:'Y-m-d' }}">
+          </div>
+            <div class="mb-3">
+              <!-- Categorías -->
+              <label for="category" class="form-label">Categoría:</label>
+            <select class="form-control" id="category" name="category">
+              <option value="">Seleccionar...</option>
+              <option value="estadistica_informacion" {% if form.category.value == 'estadistica_informacion' %}selected{% endif %}>Estadística e Información</option>
+              <option value="planeacion_estrategia" {% if form.category.value == 'planeacion_estrategia' %}selected{% endif %}>Planeación y Estrategia</option>
+              <option value="procesos_r" {% if form.category.value == 'procesos_r' %}selected{% endif %}>Procesos /R</option>
+              <option value="alianzas" {% if form.category.value == 'alianzas' %}selected{% endif %}>Alianzas</option>
+          </select>
+            {% if form.category.errors %}
+              <div class="text-danger">
+                {% for error in form.category.errors %}
+                  <p>{{ error }}</p>
+                {% endfor %}
+              </div>
+            {% endif %}
+            </div>
+            
+               <!-- Este campo es opcional y solo aparecerá si la categoría seleccionada es 'alianzas' -->
+            <div id="alianza-field" style="display: none;">
+              <label for="alianza" class="form-label">Alianza:</label>
+              <input type="text" class="form-control" id="alianza" name="alianza" value="{{ form.alianza.value|default:'' }}" />
+              {% if form.alianza.errors %}
+                <div class="text-danger">
+                  {% for error in form.alianza.errors %}
+                    <p>{{ error }}</p>
+                  {% endfor %}
                 </div>
-                <div class="col-md-3">
-                  <div class="mb-3">
-                    <label for="created_at" class="form-label">Fecha de creación:</label>
-                    <input type="date" class="form-control" id="created_at" name="created_at" 
-                           value="{{ form.created_at.value|default:''|date:'Y-m-d' }}">
-                </div>
-                  <div class="mb-3">
-                    <!-- Categorías -->
-                    <label for="category" class="form-label">Categoría:</label>
-                  <select class="form-control" id="category" name="category">
-                    <option value="">Seleccionar...</option>
-                    <option value="estadistica_informacion" {% if form.category.value == 'estadistica_informacion' %}selected{% endif %}>Estadística e Información</option>
-                    <option value="planeacion_estrategia" {% if form.category.value == 'planeacion_estrategia' %}selected{% endif %}>Planeación y Estrategia</option>
-                    <option value="procesos_r" {% if form.category.value == 'procesos_r' %}selected{% endif %}>Procesos /R</option>
-                    <option value="alianzas" {% if form.category.value == 'alianzas' %}selected{% endif %}>Alianzas</option>
+              {% endif %}
+            </div>
+            
+          </div>
+          <div class="col-md-3">
+            <div class="mb-3">
+              <!-- Fecha de Vencimiento -->
+              <label for="due_date" class="form-label">Fecha de vencimiento:</label>
+            <input type="date" class="form-control" id="due_date" name="due_date" value="{{ form.due_date.value|default:''|date:'Y-m-d' }}" />
+            {% if form.due_date.errors %}
+              <div class="text-danger">
+                {% for error in form.due_date.errors %}
+                  <p>{{ error }}</p>
+                {% endfor %}
+              </div>
+           
+            {% endif %}
+          </div>
+          <div class="mb-3" style="display: none;">
+            <!-- Tipo de modelo relacionado -->
+          <label for="related_model_type" class="form-label">Tipo de proyecto relacionado:</label>
+          <select class="form-control" id="related_model_type" name="related_model_type">
+            <option value="none" {% if form.related_model_type.value == 'none' %}selected{% endif %}>Ninguno</option>
+            <option value="alianzas" {% if form.related_model_type.value == 'alianzas' %}selected{% endif %}>Alianzas Año Presente</option>
+            <option value="planeacion" {% if form.related_model_type.value == 'planeacion' %}selected{% endif %}>Planeación Estrategia Año Presente</option>
+            <option value="estadistica" {% if form.related_model_type.value == 'estadistica' %}selected{% endif %}>Estadística Información Año Presente</option>
+            <option value="procesos" {% if form.related_model_type.value == 'procesos' %}selected{% endif %}>Procesos R Año Presente</option>
+          </select>
+          {% if form.related_model_type.errors %}
+            <div class="text-danger">
+              {% for error in form.related_model_type.errors %}
+                <p>{{ error }}</p>
+              {% endfor %}
+            </div>
+          {% endif %}
+          </div>
+           
+            <div id="all-related-objects">
+              <!-- Alianzas Objeto -->
+              <div id="alianzas-field" class="related-field" style="display: none;">
+                <label for="alianzas_object" class="form-label">Proyecto relacionado:</label>
+                <select class="form-control" id="alianzas_object" name="alianzas_object">
+                  <option value="">Seleccionar...</option>
+                  {% for obj in form.alianzas_object.field.queryset %}
+                    <option value="{{ obj.id }}" {% if form.alianzas_object.value|stringformat:"i" == obj.id|stringformat:"i" %}selected{% endif %}>{{ obj.title }}</option>
+                  {% endfor %}
                 </select>
-                  {% if form.category.errors %}
-                    <div class="text-danger">
-                      {% for error in form.category.errors %}
-                        <p>{{ error }}</p>
-                      {% endfor %}
-                    </div>
-                  {% endif %}
-                  </div>
-                  
-                     <!-- Este campo es opcional y solo aparecerá si la categoría seleccionada es 'alianzas' -->
-                  <div id="alianza-field" style="display: none;">
-                    <label for="alianza" class="form-label">Alianza:</label>
-                    <input type="text" class="form-control" id="alianza" name="alianza" value="{{ form.alianza.value|default:'' }}" />
-                    {% if form.alianza.errors %}
-                      <div class="text-danger">
-                        {% for error in form.alianza.errors %}
-                          <p>{{ error }}</p>
-                        {% endfor %}
-                      </div>
-                    {% endif %}
-                  </div>
-                  
-                </div>
-                <div class="col-md-3">
-                  <div class="mb-3">
-                    <!-- Fecha de Vencimiento -->
-                    <label for="due_date" class="form-label">Fecha de vencimiento:</label>
-                  <input type="date" class="form-control" id="due_date" name="due_date" value="{{ form.due_date.value|default:''|date:'Y-m-d' }}" />
-                  {% if form.due_date.errors %}
-                    <div class="text-danger">
-                      {% for error in form.due_date.errors %}
-                        <p>{{ error }}</p>
-                      {% endfor %}
-                    </div>
-                 
-                  {% endif %}
-                </div>
-                <div class="mb-3" style="display: none;">
-                  <!-- Tipo de modelo relacionado -->
-                <label for="related_model_type" class="form-label">Tipo de proyecto relacionado:</label>
-                <select class="form-control" id="related_model_type" name="related_model_type">
-                  <option value="none" {% if form.related_model_type.value == 'none' %}selected{% endif %}>Ninguno</option>
-                  <option value="alianzas" {% if form.related_model_type.value == 'alianzas' %}selected{% endif %}>Alianzas Año Presente</option>
-                  <option value="planeacion" {% if form.related_model_type.value == 'planeacion' %}selected{% endif %}>Planeación Estrategia Año Presente</option>
-                  <option value="estadistica" {% if form.related_model_type.value == 'estadistica' %}selected{% endif %}>Estadística Información Año Presente</option>
-                  <option value="procesos" {% if form.related_model_type.value == 'procesos' %}selected{% endif %}>Procesos R Año Presente</option>
-                </select>
-                {% if form.related_model_type.errors %}
+                {% if form.alianzas_object.errors %}
                   <div class="text-danger">
-                    {% for error in form.related_model_type.errors %}
+                    {% for error in form.alianzas_object.errors %}
                       <p>{{ error }}</p>
                     {% endfor %}
                   </div>
                 {% endif %}
-                </div>
-                 
-                  <div id="all-related-objects">
-                    <!-- Alianzas Objeto -->
-                    <div id="alianzas-field" class="related-field" style="display: none;">
-                      <label for="alianzas_object" class="form-label">Proyecto relacionado:</label>
-                      <select class="form-control" id="alianzas_object" name="alianzas_object">
-                        <option value="">Seleccionar...</option>
-                        {% for obj in form.alianzas_object.field.queryset %}
-                          <option value="{{ obj.id }}" {% if form.alianzas_object.value|stringformat:"i" == obj.id|stringformat:"i" %}selected{% endif %}>{{ obj.title }}</option>
-                        {% endfor %}
-                      </select>
-                      {% if form.alianzas_object.errors %}
-                        <div class="text-danger">
-                          {% for error in form.alianzas_object.errors %}
-                            <p>{{ error }}</p>
-                          {% endfor %}
-                        </div>
-                      {% endif %}
-                    </div>
-                  
-                    <!-- Planeación Objeto -->
-                    <div id="planeacion-field" class="related-field" style="display: none;">
-                      <label for="planeacion_object" class="form-label">Proyecto relacionado:</label>
-                      <select class="form-control" id="planeacion_object" name="planeacion_object">
-                        <option value="">Seleccionar...</option>
-                        {% for obj in form.planeacion_object.field.queryset %}
-                          <option value="{{ obj.id }}" {% if form.planeacion_object.value|stringformat:"i" == obj.id|stringformat:"i" %}selected{% endif %}>{{ obj.title }}</option>
-                        {% endfor %}
-                      </select>
-                      {% if form.planeacion_object.errors %}
-                        <div class="text-danger">
-                          {% for error in form.planeacion_object.errors %}
-                            <p>{{ error }}</p>
-                          {% endfor %}
-                        </div>
-                      {% endif %}
-                    </div>
-                  
-                    <!-- Estadística Objeto -->
-                    <div id="estadistica-field" class="related-field" style="display: none;">
-                      <label for="estadistica_object" class="form-label">Proyecto relacionado:</label>
-                      <select class="form-control" id="estadistica_object" name="estadistica_object">
-                        <option value="">Seleccionar...</option>
-                        {% for obj in form.estadistica_object.field.queryset %}
-                          <option value="{{ obj.id }}" {% if form.estadistica_object.value|stringformat:"i" == obj.id|stringformat:"i" %}selected{% endif %}>{{ obj.title }}</option>
-                        {% endfor %}
-                      </select>
-                      {% if form.estadistica_object.errors %}
-                        <div class="text-danger">
-                          {% for error in form.estadistica_object.errors %}
-                            <p>{{ error }}</p>
-                          {% endfor %}
-                        </div>
-                      {% endif %}
-                    </div>
-                  
-                    <!-- Procesos Objeto -->
-                    <div id="procesos-field" class="related-field" style="display: none;">
-                      <label for="procesos_object" class="form-label">Proyecto relacionado:</label>
-                      <select class="form-control" id="procesos_object" name="procesos_object">
-                        <option value="">Seleccionar...</option>
-                        {% for obj in form.procesos_object.field.queryset %}
-                          <option value="{{ obj.id }}" {% if form.procesos_object.value|stringformat:"i" == obj.id|stringformat:"i" %}selected{% endif %}>{{ obj.title }}</option>
-                        {% endfor %}
-                      </select>
-                      {% if form.procesos_object.errors %}
-                        <div class="text-danger">
-                          {% for error in form.procesos_object.errors %}
-                            <p>{{ error }}</p>
-                          {% endfor %}
-                        </div>
-                      {% endif %}
-                    </div>
-                  </div>
-                </div>
-
               </div>
-              
-              <div class="row">
-                <!-- Dependencias con checkboxes y desplazamiento -->
-                <div class="col-md-8 mb-3 mt-2">
-                  <label class="form-label">Dependencias:</label>
-                  <div id="dependencies-container" 
-                       style="max-height: 148px; overflow-y: auto; border: 1px solid #ccc; padding: 10px; border-radius: 5px;">
-                      {% for task in form.dependencies.field.queryset %}
-                          {% if task.id != current_task.id %}  {# Oculta la tarea actual #}
-                              <div class="form-check dependency-item" 
-                                   data-created-at="{{ task.created_at|date:'Y-m-d' }}" 
-                                   data-due-date="{{ task.due_date|date:'Y-m-d' }}">
-                                  <input class="form-check-input dependency-checkbox" type="checkbox" name="dependencies" 
-                                         value="{{ task.id }}" id="task-{{ task.id }}"
-                                         {% if task.id in form.dependencies.value %}checked{% endif %}>
-                                  <label class="form-check-label" for="task-{{ task.id }}">
-                                      {{ task.title }}
-                                  </label>
-                                  <span class="dependency-warning" style="display: none; color: #888; font-size: 0.9em;"></span>
-                              </div>
-                          {% endif %}
-                      {% endfor %}
+            
+              <!-- Planeación Objeto -->
+              <div id="planeacion-field" class="related-field" style="display: none;">
+                <label for="planeacion_object" class="form-label">Proyecto relacionado:</label>
+                <select class="form-control" id="planeacion_object" name="planeacion_object">
+                  <option value="">Seleccionar...</option>
+                  {% for obj in form.planeacion_object.field.queryset %}
+                    <option value="{{ obj.id }}" {% if form.planeacion_object.value|stringformat:"i" == obj.id|stringformat:"i" %}selected{% endif %}>{{ obj.title }}</option>
+                  {% endfor %}
+                </select>
+                {% if form.planeacion_object.errors %}
+                  <div class="text-danger">
+                    {% for error in form.planeacion_object.errors %}
+                      <p>{{ error }}</p>
+                    {% endfor %}
                   </div>
-              </div>              
-                <!-- Estado -->
-                <div class="col-md-4 mb-3 mt-2">
-                  <div class="mb-2">
-                    <label for="status" class="form-label">Estado:</label>
-                    <select class="form-control" id="status" name="status">
-                      <option value="in_progress" {% if form.status.value == 'in_progress' %}selected{% endif %}>En Proceso</option>
-                      <option value="completed" {% if form.status.value == 'completed' %}selected{% endif %}>Completado</option>
-                    </select>
-                    {% if form.status.errors %}
-                      <div class="text-danger">
-                        {% for error in form.status.errors %}
-                          <p>{{ error }}</p>
-                        {% endfor %}
-                      </div>
-                    {% endif %}
+                {% endif %}
+              </div>
+            
+              <!-- Estadística Objeto -->
+              <div id="estadistica-field" class="related-field" style="display: none;">
+                <label for="estadistica_object" class="form-label">Proyecto relacionado:</label>
+                <select class="form-control" id="estadistica_object" name="estadistica_object">
+                  <option value="">Seleccionar...</option>
+                  {% for obj in form.estadistica_object.field.queryset %}
+                    <option value="{{ obj.id }}" {% if form.estadistica_object.value|stringformat:"i" == obj.id|stringformat:"i" %}selected{% endif %}>{{ obj.title }}</option>
+                  {% endfor %}
+                </select>
+                {% if form.estadistica_object.errors %}
+                  <div class="text-danger">
+                    {% for error in form.estadistica_object.errors %}
+                      <p>{{ error }}</p>
+                    {% endfor %}
                   </div>
-                  <!-- Responsable -->
-                  <div class="col-md-8 mb-3">
-                    <label class="form-label">Usuarios asignados:</label>
-                    <div id="assigned-users-container"
-                         style="max-height: 70px; overflow-y: auto; border: 1px solid #ccc; padding: 10px; border-radius: 5px;">
-                        {% for user in form.assigned_users.field.queryset %}
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" name="assigned_users" value="{{ user.id }}"
-                                       id="user-{{ user.id }}" {% if user.id in form.assigned_users.value %}checked{% endif %}>
-                                <label class="form-check-label" for="user-{{ user.id }}">
-                                  {{ user.get_full_name|default:user.username }}
-                                </label>
-                            </div>
-                        {% endfor %}
-                    </div>
+                {% endif %}
+              </div>
+            
+              <!-- Procesos Objeto -->
+              <div id="procesos-field" class="related-field" style="display: none;">
+                <label for="procesos_object" class="form-label">Proyecto relacionado:</label>
+                <select class="form-control" id="procesos_object" name="procesos_object">
+                  <option value="">Seleccionar...</option>
+                  {% for obj in form.procesos_object.field.queryset %}
+                    <option value="{{ obj.id }}" {% if form.procesos_object.value|stringformat:"i" == obj.id|stringformat:"i" %}selected{% endif %}>{{ obj.title }}</option>
+                  {% endfor %}
+                </select>
+                {% if form.procesos_object.errors %}
+                  <div class="text-danger">
+                    {% for error in form.procesos_object.errors %}
+                      <p>{{ error }}</p>
+                    {% endfor %}
                   </div>
-                </div>
+                {% endif %}
               </div>
             </div>
-          </form>
-          <!-- Botones fuera del formulario y alineados a la izquierda y derecha -->
-          <div class="d-flex">
-            <button type="submit" form="task-form" class="btn btn-success ms-auto">
-                {% if form.instance.pk %}
-                    Actualizar
-                {% else %}
-                    Crear
-                {% endif %}
-                Tarea
-            </button>
-        </div>        
+          </div>
+
+        </div>
+        
+        <div class="row">
+          <!-- Dependencias con checkboxes y desplazamiento -->
+          <div class="col-md-8 mb-3 mt-2">
+            <label class="form-label">Dependencias:</label>
+            <div id="dependencies-container" 
+                 style="max-height: 148px; overflow-y: auto; border: 1px solid #ccc; padding: 10px; border-radius: 5px;">
+                {% for task in form.dependencies.field.queryset %}
+                    {% if task.id != current_task.id %}  {# Oculta la tarea actual #}
+                        <div class="form-check dependency-item" 
+                             data-created-at="{{ task.created_at|date:'Y-m-d' }}" 
+                             data-due-date="{{ task.due_date|date:'Y-m-d' }}">
+                            <input class="form-check-input dependency-checkbox" type="checkbox" name="dependencies" 
+                                   value="{{ task.id }}" id="task-{{ task.id }}"
+                                   {% if task.id in form.dependencies.value %}checked{% endif %}>
+                            <label class="form-check-label" for="task-{{ task.id }}">
+                                {{ task.title }}
+                            </label>
+                            <span class="dependency-warning" style="display: none; color: #888; font-size: 0.9em;"></span>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </div>              
+          <!-- Estado -->
+          <div class="col-md-4 mb-3 mt-2">
+            <div class="mb-2">
+              <label for="status" class="form-label">Estado:</label>
+              <select class="form-control" id="status" name="status">
+                <option value="in_progress" {% if form.status.value == 'in_progress' %}selected{% endif %}>En Proceso</option>
+                <option value="completed" {% if form.status.value == 'completed' %}selected{% endif %}>Completado</option>
+              </select>
+              {% if form.status.errors %}
+                <div class="text-danger">
+                  {% for error in form.status.errors %}
+                    <p>{{ error }}</p>
+                  {% endfor %}
+                </div>
+              {% endif %}
+            </div>
+            <!-- Responsable -->
+            <div class="col-md-8 mb-3">
+              <label class="form-label">Usuarios asignados:</label>
+              <div id="assigned-users-container"
+                   style="max-height: 70px; overflow-y: auto; border: 1px solid #ccc; padding: 10px; border-radius: 5px;">
+                  {% for user in form.assigned_users.field.queryset %}
+                      <div class="form-check">
+                          <input class="form-check-input" type="checkbox" name="assigned_users" value="{{ user.id }}"
+                                 id="user-{{ user.id }}" {% if user.id in form.assigned_users.value %}checked{% endif %}>
+                          <label class="form-check-label" for="user-{{ user.id }}">
+                            {{ user.get_full_name|default:user.username }}
+                          </label>
+                      </div>
+                  {% endfor %}
+              </div>
+            </div>
+          </div>
         </div>
       </div>
-    </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-      document.addEventListener("DOMContentLoaded", function () {
-        const categorySelect = document.getElementById("category");
-        const relatedTypeSelect = document.getElementById("related_model_type");
-        const alianzaField = document.getElementById("alianza-field");
+    </form>
+    <!-- Botones fuera del formulario y alineados a la izquierda y derecha -->
+    <div class="d-flex">
+      <button type="submit" form="task-form" class="btn btn-success ms-auto">
+          {% if form.instance.pk %}
+              Actualizar
+          {% else %}
+              Crear
+          {% endif %}
+          Tarea
+      </button>
+  </div>        
+  </div>
+</div>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const categorySelect = document.getElementById('category')
+      const relatedTypeSelect = document.getElementById('related_model_type')
+      const alianzaField = document.getElementById('alianza-field')
     
-        // Mapeo de categorías a tipos de proyectos
-        const categoryToProjectType = {
-          estadistica_informacion: "estadistica",
-          planeacion_estrategia: "planeacion",
-          procesos_r: "procesos",
-          alianzas: "alianzas",
-        };
+      // Mapeo de categorías a tipos de proyectos
+      const categoryToProjectType = {
+        estadistica_informacion: 'estadistica',
+        planeacion_estrategia: 'planeacion',
+        procesos_r: 'procesos',
+        alianzas: 'alianzas'
+      }
     
-        // Función para actualizar el tipo de proyecto relacionado
-        function updateRelatedType() {
-          const selectedCategory = categorySelect.value;
-          relatedTypeSelect.value = categoryToProjectType[selectedCategory] || "none";
-          
-          // Mostrar el campo "alianza" si la categoría es "alianzas"
-          alianzaField.style.display = selectedCategory === "alianzas" ? "block" : "none";
+      // Función para actualizar el tipo de proyecto relacionado
+      function updateRelatedType() {
+        const selectedCategory = categorySelect.value
+        relatedTypeSelect.value = categoryToProjectType[selectedCategory] || 'none'
     
-          // Actualizar los campos visibles según el tipo de modelo
-          showSelectedField();
+        // Mostrar el campo "alianza" si la categoría es "alianzas"
+        alianzaField.style.display = selectedCategory === 'alianzas' ? 'block' : 'none'
+    
+        // Actualizar los campos visibles según el tipo de modelo
+        showSelectedField()
+      }
+      // Función para ocultar todos los campos de objetos relacionados
+      function hideAllRelatedFields() {
+        document.querySelectorAll('.related-field').forEach((field) => {
+          field.style.display = 'none'
+        })
+      }
+      // Función para mostrar el campo correspondiente al tipo de modelo seleccionado
+      function showSelectedField() {
+        hideAllRelatedFields()
+    
+        var selectedModel = relatedTypeSelect.value
+    
+        if (selectedModel === 'alianzas') {
+          document.getElementById('alianzas-field').style.display = 'block'
+        } else if (selectedModel === 'planeacion') {
+          document.getElementById('planeacion-field').style.display = 'block'
+        } else if (selectedModel === 'estadistica') {
+          document.getElementById('estadistica-field').style.display = 'block'
+        } else if (selectedModel === 'procesos') {
+          document.getElementById('procesos-field').style.display = 'block'
         }
-        // Función para ocultar todos los campos de objetos relacionados
-        function hideAllRelatedFields() {
-          document.querySelectorAll('.related-field').forEach(field => {
-            field.style.display = 'none';
-          });
-        }
-        // Función para mostrar el campo correspondiente al tipo de modelo seleccionado
-        function showSelectedField() {
-          hideAllRelatedFields();
-          
-          var selectedModel = relatedTypeSelect.value;
+      }
+      // Evento para cambiar el tipo de proyecto cuando cambie la categoría
+      categorySelect.addEventListener('change', updateRelatedType)
     
-          if (selectedModel === 'alianzas') {
-            document.getElementById('alianzas-field').style.display = 'block';
-          } else if (selectedModel === 'planeacion') {
-            document.getElementById('planeacion-field').style.display = 'block';
-          } else if (selectedModel === 'estadistica') {
-            document.getElementById('estadistica-field').style.display = 'block';
-          } else if (selectedModel === 'procesos') {
-            document.getElementById('procesos-field').style.display = 'block';
+      // Evento para cambiar la visualización cuando cambie el tipo de modelo
+      relatedTypeSelect.addEventListener('change', showSelectedField)
+    
+      updateRelatedType()
+      showSelectedField()
+    })
+  </script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const dateInput = document.getElementById('created_at') // Fecha de creación de la tarea actual
+      const dependenciesContainer = document.getElementById('dependencies-container')
+    
+      function updateDependencies() {
+        const selectedDate = dateInput.value // Fecha de creación de la tarea actual
+        const dependencyItems = dependenciesContainer.querySelectorAll('.dependency-item')
+    
+        dependencyItems.forEach((item) => {
+          const taskCreatedAt = item.getAttribute('data-created-at') // Fecha de creación de la dependencia
+          const taskDueDate = item.getAttribute('data-due-date') // Fecha de vencimiento de la dependencia
+          const checkbox = item.querySelector('.dependency-checkbox')
+          const label = item.querySelector('.form-check-label')
+          const warning = item.querySelector('.dependency-warning')
+    
+          let warningMessage = ''
+    
+          // Regla 1: Mismo día de creación
+          if (taskCreatedAt === selectedDate) {
+            warningMessage = 'No se puede elegir: Fecha de creación igual'
           }
-        }
-        // Evento para cambiar el tipo de proyecto cuando cambie la categoría
-        categorySelect.addEventListener("change", updateRelatedType);
-        
-        // Evento para cambiar la visualización cuando cambie el tipo de modelo
-        relatedTypeSelect.addEventListener("change", showSelectedField);
-
-        updateRelatedType();
-        showSelectedField();
-      });
-    </script>
-    <script>
-      document.addEventListener("DOMContentLoaded", function () {
-          const dateInput = document.getElementById("created_at"); // Fecha de creación de la tarea actual
-          const dependenciesContainer = document.getElementById("dependencies-container");
-  
-          function updateDependencies() {
-              const selectedDate = dateInput.value; // Fecha de creación de la tarea actual
-              const dependencyItems = dependenciesContainer.querySelectorAll(".dependency-item");
-  
-              dependencyItems.forEach(item => {
-                  const taskCreatedAt = item.getAttribute("data-created-at"); // Fecha de creación de la dependencia
-                  const taskDueDate = item.getAttribute("data-due-date"); // Fecha de vencimiento de la dependencia
-                  const checkbox = item.querySelector(".dependency-checkbox");
-                  const label = item.querySelector(".form-check-label");
-                  const warning = item.querySelector(".dependency-warning");
-  
-                  let warningMessage = "";
-  
-                  // Regla 1: Mismo día de creación
-                  if (taskCreatedAt === selectedDate) {
-                      warningMessage = "No se puede elegir: Fecha de creación igual";
-                  }
-                  
-                  // Regla 2: Creación futura
-                  else if (taskCreatedAt > selectedDate) {
-                      warningMessage = "No se puede elegir: Fecha de creación futura";
-                  }
-                  
-                  // Regla 3: Fecha de vencimiento mayor a la fecha de creación de la tarea actual
-                  else if (taskDueDate > selectedDate) {
-                      warningMessage = "No se puede elegir: Fecha de finalización no completada";
-                  }
-  
-                  if (warningMessage) {
-                      checkbox.disabled = true;
-                      label.style.color = "#888"; // Texto en gris
-                      warning.style.display = "inline";
-                      warning.textContent = warningMessage;
-                  } else {
-                      checkbox.disabled = false;
-                      label.style.color = ""; // Color normal
-                      warning.style.display = "none";
-                  }
-              });
+    
+          // Regla 2: Creación futura
+          else if (taskCreatedAt > selectedDate) {
+            warningMessage = 'No se puede elegir: Fecha de creación futura'
           }
-  
-          dateInput.addEventListener("change", updateDependencies);
-          updateDependencies();
-      });
-    </script>  
-  </body>
-</html>
+    
+          // Regla 3: Fecha de vencimiento mayor a la fecha de creación de la tarea actual
+          else if (taskDueDate > selectedDate) {
+            warningMessage = 'No se puede elegir: Fecha de finalización no completada'
+          }
+    
+          if (warningMessage) {
+            checkbox.disabled = true
+            label.style.color = '#888' // Texto en gris
+            warning.style.display = 'inline'
+            warning.textContent = warningMessage
+          } else {
+            checkbox.disabled = false
+            label.style.color = '' // Color normal
+            warning.style.display = 'none'
+          }
+        })
+      }
+    
+      dateInput.addEventListener('change', updateDependencies)
+      updateDependencies()
+    })
+  </script>
+{% endblock %}
