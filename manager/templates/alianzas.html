@@ -76,7 +76,7 @@
         <h4 class="custom-title text-white">Proyectos</h4>
         <ul class="list-group">
           {% for alianza in alianzas %}
-            <li class="list-group-item d-flex justify-content-between align-items-center">
+            <li class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
               <strong class="numero-item me-3">{{ forloop.counter }}.</strong>
               <div title="{{ alianza.description }}" class="flex-grow-1">{{ alianza.title }}</div>
               <div class="btn-group btn-group-sm">
@@ -102,7 +102,7 @@
     <div class="col-md-7">
       <div class="lista-container lista me-3 mt-0 mb-2">
         <h4 class="custom-title text-white">Resultados Esperados</h4>
-        <table class="table table-bordered">
+        <table class="table table-hover table-bordered">
           <thead>
             <tr>
               <th class="text-center">Título</th>

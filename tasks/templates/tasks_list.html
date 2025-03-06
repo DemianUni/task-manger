@@ -7,15 +7,8 @@
 {% block extra_css %}
   <style>
     table td {
-      font-size: 15px; /* Reduce el tamaño de las celdas */
+      font-size: 14px; /* Reduce el tamaño de las celdas */
       vertical-align: middle !important;
-    }
-    .titulo {
-      text-align: center;
-      margin-bottom: 30px;
-      font-size: 1.5rem;
-      font-weight: bold;
-      margin-top: 38px;
     }
     /* Anchos personalizados para cada columna */
     .col-id {
@@ -25,10 +18,10 @@
       width: 30%;
     }
     .col-categoria {
-      width: 19.5%;
+      width: 16.5%;
     }
     .col-alianza {
-      width: 11%;
+      width: 10%;
     }
     .col-dependencias {
       width: 1%;
@@ -37,13 +30,13 @@
       width: 1%;
     }
     .col-fecha-i {
-      width: 9%;
+      width: 7%;
     }
     .col-fecha {
-      width: 9%;
+      width: 7%;
     }
     .col-estado {
-      width: 12%;
+      width: 14%;
     }
     .col-acciones {
       width: 6.5%;
@@ -88,7 +81,7 @@
     <div class="d-flex justify-content-start align-items-center mb-3">
       {% if user.is_superuser %}
         <!-- Botón para crear una nueva tarea -->
-        <a href="{% url 'task_create' %}" class="btn btn-primary btn-agregar">Agregar Tarea</a>
+        <a href="{% url 'task_create' %}" class="btn btn-success btn-agregar">Agregar Tarea</a>
       {% endif %}
 
       <!-- Texto "Filtrar por Categoría" -->
@@ -116,8 +109,8 @@
           <th class="col-alianza text-center">Alianza</th>
           <th class="col-dependencias text-center">DP</th>
           <th class="col-responsables text-center">RP</th>
-          <th class="col-fecha-i text-center">Fecha de Inicio</th>
-          <th class="col-fecha text-center">Fecha de Vencimiento</th>
+          <th class="col-fecha-i text-center">Fecha Inicio</th>
+          <th class="col-fecha text-center">Fecha Limite</th>
           <th class="col-estado text-center">Estado</th>
           {% if user.is_superuser %}
             <th class="col-acciones text-center">Acciones</th>
@@ -185,7 +178,7 @@
     <div class="d-flex justify-content-start align-items-center mb-3">
       {% if user.is_superuser %}
         <!-- Botón para crear una nueva tarea semanal -->
-        <a href="{% url 'WeeklyTask_create' %}" class="btn btn-primary btn-agregar">Agregar Tarea semanal</a>
+        <a href="{% url 'WeeklyTask_create' %}" class="btn btn-success btn-agregar">Agregar Tarea semanal</a>
       {% endif %}
       
     </div>
