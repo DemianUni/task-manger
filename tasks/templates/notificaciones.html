@@ -1,8 +1,34 @@
 <!-- notificaciones.html -->
-
+<style>
+  h2 {
+    font-size: 24px; /* Tamaño del título */
+    font-weight: bold;
+  }
+  
+  .list-group-item {
+    font-size: 14px; /* Tamaño del texto en los elementos de la lista */
+  }
+  
+  .list-group-item strong {
+    font-size: 14px; /* Tamaño del texto en negrita */
+  }
+  
+  .list-group-item small {
+    font-size: 14px; /* Tamaño del texto de las fechas */
+  }
+  
+  .text-danger {
+    font-size: 16px; /* Tamaño del texto de "Vencida" */
+    font-weight: bold;
+  }
+  
+  .text-info {
+    font-size: 14px; /* Tamaño del texto de categoría */
+  }
+</style>
 <div class="row">
   <!-- Columna para tareas vencidas -->
-  <div class="col-md-6">
+  <div class="col-md-6 pe-2">
     <h2>Tareas Vencidas</h2>
     <ul class="list-group">
       {% if overdue_tasks %}
@@ -21,7 +47,7 @@
   </div>
 
   <!-- Columna para tareas solapadas -->
-  <div class="col-md-6">
+  <div class="col-md-6 ps-2">
     <h2>Tareas Solapadas</h2>
     <ul class="list-group">
       {% if overlapping_tasks %}

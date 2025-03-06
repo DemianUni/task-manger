@@ -103,7 +103,7 @@
           <thead>
             <tr>
               <th class="text-center">Título</th>
-              <th class="text-center">Fecha de Vencimiento</th>
+              <th class="text-center">Fecha Limite</th>
               <th class="text-center">Estado</th>
             </tr>
           </thead>
@@ -113,35 +113,16 @@
                 <td class="col-titulo" data-bs-toggle="tooltip" data-bs-placement="top" title="{{ task.description }}">{{ task.title }}</td>
                 <td class="text-center">{{ task.due_date|date:'d/m/Y' }}</td>
                 <td class="text-center align-middle
-                          {% if task.status == 'completed' %}
-                    
-                    
+                          {% if task.status == 'completed' %}                             
                       bg-success text-white
-
-
-                  {% elif task.status == 'overdue' %}
-                    
+                  {% elif task.status == 'overdue' %}                    
                      bg-danger text-white
-
-
-                  {% elif task.status == 'due_soon' %}
-                    
-     
+                  {% elif task.status == 'due_soon' %}                       
                       bg-warning text-dark
-
-
                   {% elif task.status == 'in_progress' %}
-                    
- 
                       bg-secondary text-white
-
-
                   {% else %}
-                    
-
                       bg-primary text-white
-
-
                   {% endif %}">{{ task.get_status_display }}</td>
               </tr>
             {% empty %}
@@ -179,7 +160,7 @@
             </div>
             <div class="modal-footer">
               <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-              <button type="submit" class="btn btn-primary">Guardar cambios</button>
+              <button type="submit" class="btn text-white" style="background-color: #004b94;">Guardar cambios</button>
             </div>
           </form>
         </div>
@@ -229,7 +210,7 @@
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-            <button type="submit" class="btn btn-primary">Guardar</button>
+            <button type="submit" class="btn text-white" style="background-color: #004b94;">Guardar</button>
           </div>
         </form>
       </div>
