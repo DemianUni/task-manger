@@ -22,8 +22,10 @@
     font-weight: bold;
   }
   
-  .text-info {
+  .text-custom {
     font-size: 14px; /* Tamaño del texto de categoría */
+    color: #004b94;
+    font-weight: bold;
   }
 </style>
 <div class="row">
@@ -35,8 +37,8 @@
         {% for task in overdue_tasks %}
           <li class="list-group-item">
             <strong>{{ task.title }} |</strong>
-            <span class="text-info">{{ task.get_category_display }}</span><br />
-            <span class="text-danger">Vencida</span><br />
+            <span class="text-custom">{{ task.get_category_display }}</span><br />
+            <span class="text-danger">Vencida </span><span>| </span>
             <small>{{ task.due_date|date:'d-m-Y' }}</small>
           </li>
         {% endfor %}
@@ -53,8 +55,8 @@
       {% if overlapping_tasks %}
         {% for task, other_task in overlapping_tasks %}
           <li class="list-group-item">
-            <strong>{{ task.title }}</strong> se solapa con <strong>{{ other_task.title }}</strong><br />
-            <small>Fechas: {{ task.due_date|date:'d-m-Y' }} y {{ other_task.due_date|date:'d-m-Y' }}</small>
+            <strong>{{ task.title }}</strong><span class="text-danger"> se solapa con </span><strong>{{ other_task.title }}</strong><br />
+            <span class="text-custom">Fechas: </span><small>{{ task.due_date|date:'d-m-Y' }} y {{ other_task.due_date|date:'d-m-Y' }}</small>
           </li>
         {% endfor %}
       {% else %}

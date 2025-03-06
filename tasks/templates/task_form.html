@@ -14,7 +14,7 @@
     <!-- Formulario -->
     <form method="POST" id="task-form">
       {% csrf_token %}
-      <div class="mb-3 p-3 rounded">
+      <div class="mb-1 p-3 rounded">
         <div class="row">
           <div class="col-md-6">
             
@@ -51,7 +51,7 @@
           </div>
             <div class="mb-3">
               <!-- Categorías -->
-              <label for="category" class="form-label">Categoría:</label>
+              <label for="category" class="form-label">Área:</label>
             <select class="form-control" id="category" name="category">
               <option value="">Seleccionar...</option>
               <option value="estadistica_informacion" {% if form.category.value == 'estadistica_informacion' %}selected{% endif %}>Estadística e Información</option>
@@ -194,10 +194,10 @@
         
         <div class="row">
           <!-- Dependencias con checkboxes y desplazamiento -->
-          <div class="col-md-8 mb-3 mt-2">
+          <div class="col-md-8 mt-2">
             <label class="form-label">Dependencias:</label>
             <div id="dependencies-container" 
-                 style="max-height: 148px; overflow-y: auto; border: 1px solid #ccc; padding: 10px; border-radius: 5px;">
+                 style="max-height: 146px; overflow-y: auto; border: 1px solid #ccc; padding: 10px; border-radius: 5px;">
                 {% for task in form.dependencies.field.queryset %}
                     {% if task.id != current_task.id %}  {# Oculta la tarea actual #}
                         <div class="form-check dependency-item" 
@@ -216,7 +216,7 @@
             </div>
         </div>              
           <!-- Estado -->
-          <div class="col-md-4 mb-3 mt-2">
+          <div class="col-md-4 mt-2">
             <div class="mb-2">
               <label for="status" class="form-label">Estado:</label>
               <select class="form-control" id="status" name="status">
@@ -232,10 +232,10 @@
               {% endif %}
             </div>
             <!-- Responsable -->
-            <div class="mb-3">
-              <label class="form-label">Usuarios asignados:</label>
+            <div>
+              <label class="form-label">Responsable:</label>
               <div id="assigned-users-container"
-                   style="max-height: 70px; overflow-y: auto; border: 1px solid #ccc; padding: 10px; border-radius: 5px;">
+                   style="max-height: 68px; overflow-y: auto; border: 1px solid #ccc; padding: 10px; border-radius: 5px;">
                   {% for user in form.assigned_users.field.queryset %}
                       <div class="form-check">
                           <input class="form-check-input" type="checkbox" name="assigned_users" value="{{ user.id }}"
